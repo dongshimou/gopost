@@ -1,0 +1,12 @@
+{
+  "database":{
+    "host":"127.0.0.1",
+    "port":"3306",
+    "username":"gopost",
+    "password":"123456",
+    "database":"gopost_database_v1_"
+  },
+  "server":{
+    "port":"12345"
+  }
+}
