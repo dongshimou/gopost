@@ -11,6 +11,12 @@ const (
 
 	ERROR_UNKNOW_CODE = 1001
 	ERROR_UNKNOW_MSG  = "未知错误"
+
+	ERROR_PARSE_CODE = 1002
+	ERROR_PARSE_MSG  = "解析错误"
+
+	ERROR_REQUEST_CODE = 1003
+	ERROR_REQUEST_MSG  = "请求错误"
 )
 
 type InnerError struct {

@@ -2,21 +2,22 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"model"
 	"log"
+	"model"
 	"service"
 )
 
-func Login(c *gin.Context) {
-	var req model.REQLogin
+func GetPost(c *gin.Context) {
+	var req model.REQGetPost
 
+	req.Title = c.Param("title")
+	// 等待 gin 的bind url 功能
 	err := c.Bind(&req)
-
 	if err != nil {
 		log.Print(err)
 		return
 	}
-	res,err := service.Login(&req)
+	res, err := service.GetPost(&req)
 	if err != nil {
 		DoResponseFail(c, err)
 		return

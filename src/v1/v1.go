@@ -3,16 +3,20 @@ package v1
 import (
 	. "base"
 	"controller"
-	"handler"
 	"github.com/gin-gonic/gin"
+	"handler"
+	"model"
 	"net/http"
 )
 
 func InitV1() error {
+
 	err := controller.InitDB()
 	if err != nil {
 		return err
 	}
+	controller.GetDB().Create(&model.User{Name: "root"})
+	//controller.GetDB().Model(&model.Post{}).AddForeignKey("author_id","users(id)","RESTRICT","RESTRICT")
 	return nil
 }
 func GetRoutes() []Route {
@@ -42,6 +46,20 @@ var routes = []Route{
 		"POST",
 		"/v1/login",
 		handler.Login,
+		nil,
+	},
+	Route{
+		"Logout",
+		"Get",
+		"/v1/logout",
+		handler.Logout,
+		nil,
+	},
+	Route{
+		"GetPost",
+		"GET",
+		"/v1/post/:title",
+		handler.GetPost,
 		nil,
 	},
 }

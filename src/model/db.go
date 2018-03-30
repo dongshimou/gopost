@@ -1,39 +1,50 @@
 package model
 
-import "time"
+import (
+	"github.com/jinzhu/gorm"
+)
 
 type Post struct {
-	Pid               int64  `gorm:"primary_key;auto_increment;"`
-	Title             string `gorm:"size:255;not null;"`
-	Author            User
-	Tags              []Tag
-	Replays           []Replay
-	Context           string    `gorm:"size:65535"`
-	CreateDatetime    time.Time `gorm:"default:now();"`
-	EditDatetime      time.Time `gorm:"default:now();"`
-	EditPersion       User
-	PermissionRequire int
-}
-type Replay struct {
-	Rid            int64 `gorm:"primary_key;auto_increment;"`
-	Post           Post
-	User           User
-	Context        string    `gorm:"size:2048"`
-	CreateDatetime time.Time `gorm:"default:now();"`
-}
-type Tag struct {
-	Tid            int64     `gorm:"primary_key;auto_increment;"`
-	Name           string    `gorm:"size:255"`
-	CreateDatetime time.Time `gorm:"default:now();"`
+	gorm.Model
+	Title        string `gorm:"size:255;not null;unique;"`
+	Author       User   `gorm:"FOREIGNKEY:AuthorID;"`
+	AuthorID     uint
+	EditPerson   User `gorm:"FOREIGNKEY:EditPersonID;"`
+	EditPersonID uint
+
+	Tags    []Tag  `gorm:"many2many:tag_posts;"`
+	Context string `gorm:"size:65535;"`
+	//Replays           []Replay `gorm:"FOREIGNKEY:PostID;"`
+	PermissionRequire int `gorm:"default:1;"`
 }
 
+const (
+	DB_Post_Tags = "tags"
+)
+
+//type Replay struct {
+//	gorm.Model
+//	PostID  uint
+//	User    User `gorm:"FOREIGNKEY:UserID;"`
+//	UserID  uint
+//	Context string `gorm:"size:2048;"`
+//}
+type Tag struct {
+	gorm.Model
+	Name  string `gorm:"size:255;"`
+	Posts []Post `gorm:"many2many:tag_posts;"`
+}
+
+const (
+	DB_Table_Tag = "tags"
+)
+
 type User struct {
-	Uid            int64     `gorm:"primary_key;auto_increment;"`
-	Name           string    `gorm:"size:255;not null;"`
-	Email          string    `gorm:"size:255"`
-	Permission     int       `gorm:"default:1"`
-	CreateDatetime time.Time `gorm:"default:now();"`
-	Token          string    `gorm:"size:2048"`
-	Posts          []Post
-	Replays        []Replay
+	gorm.Model
+	Name       string `gorm:"size:255;not null;unique;"`
+	Email      string `gorm:"size:255;"`
+	Permission int    `gorm:"default:1;"`
+	Token      string `gorm:"size:2048;"`
+	//Posts      []Post `gorm:"FOREIGNKEY:AuthorID;"`
+	//Replays    []Replay `gorm:"FOREIGNKEY:UserID;"`
 }
