@@ -37,9 +37,21 @@ func (*InnerError) New(code int, args ...interface{}) *InnerError {
 		Pos:  fmt.Sprintf("%s %d", file, line),
 	}
 }
-func NewError(code int, args ...interface{}) *InnerError {
+func NewError(code int,msg string, args ...interface{}) *InnerError {
 	s := InnerError{}
 	return s.New(code, args...)
+}
+func Wrap(err error,code int,msg string,args...interface{})*InnerError{
+	if err==nil{
+		return NewError(code,msg,args...)
+	}
+	v,ok:=err.(*InnerError)
+	if ok{
+		args=append(args,msg)
+		return NewError(v.Code,v.Msg,args...)
+	}else{
+		return NewError(code,msg,args...)
+	}
 }
 func (e *InnerError) Error() string {
 	return fmt.Sprintf("Code : %d , Msg : %s ", e.Code, e.Msg)

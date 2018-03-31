@@ -3,6 +3,7 @@ package utility
 import (
 	"strconv"
 	"time"
+	"strings"
 )
 
 func IsNullorEmpty(para interface{}) bool {
@@ -24,11 +25,11 @@ func IsNullorEmpty(para interface{}) bool {
 			return true
 		}
 	case string:
-		if v == "" {
+		if strings.TrimSpace(v) == "" {
 			return true
 		}
 	case *string:
-		if v == nil || *v == "" {
+		if v == nil || strings.TrimSpace(*v) == "" {
 			return true
 		}
 	case *int:
