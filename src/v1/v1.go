@@ -10,12 +10,11 @@ import (
 )
 
 func InitV1() error {
-
 	err := controller.InitDB()
 	if err != nil {
 		return err
 	}
-	controller.GetDB().Create(&model.User{Name: "root"})
+	controller.GetDB().Create(&model.User{Name: "root", Password: "123456"})
 	//controller.GetDB().Model(&model.Post{}).AddForeignKey("author_id","users(id)","RESTRICT","RESTRICT")
 	return nil
 }
@@ -23,7 +22,6 @@ func GetRoutes() []Route {
 	return routes
 }
 func Fail(c *gin.Context) {
-	//c.String(http.StatusOK, "admin auth failed")
 	c.JSON(
 		http.StatusOK,
 		map[string]interface{}{
@@ -53,6 +51,13 @@ var routes = []Route{
 		"Get",
 		"/v1/logout",
 		handler.Logout,
+		nil,
+	},
+	Route{
+		"SignUp",
+		"Post",
+		"/v1/signup",
+		handler.SignUp,
 		nil,
 	},
 	Route{

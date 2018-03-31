@@ -27,3 +27,7 @@ func Logout(c *gin.Context) {
 
 	DoResponseOK(c, nil)
 }
+
+func SignUp(c *gin.Context) {
+
+}

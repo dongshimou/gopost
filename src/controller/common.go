@@ -34,9 +34,9 @@ func InitDB() error {
 	if db.HasTable(&model.Post{}) == false {
 		db = db.CreateTable(&model.Post{})
 	}
-	//if db.HasTable(&model.Replay{}) == false {
-	//	db=db.CreateTable(&model.Replay{})
-	//}
+	if db.HasTable(&model.Replay{}) == false {
+		db = db.CreateTable(&model.Replay{})
+	}
 	if db.HasTable(&model.User{}) == false {
 		db = db.CreateTable(&model.User{})
 	}

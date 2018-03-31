@@ -11,4 +11,11 @@ type REQGetPost struct {
 }
 
 type REQLogin struct {
+	Username string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
+}
+
+type REQSignUp struct {
+	REQLogin
+	Email string `json:"email"`
 }
