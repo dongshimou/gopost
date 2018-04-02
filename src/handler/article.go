@@ -2,15 +2,15 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"model"
 	"log"
+	"model"
 	"service"
 )
 
-func NewReplay(c *gin.Context)  {
+func NewReplay(c *gin.Context) {
 	var req model.REQNewReplay
 
-	req.Aid=c.Param("aid")
+	req.Aid = c.Param("aid")
 	err := c.Bind(&req)
 	if err != nil {
 		log.Print(err)

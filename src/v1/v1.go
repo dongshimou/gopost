@@ -15,7 +15,7 @@ func InitV1() error {
 		return err
 	}
 	controller.GetDB().Create(&model.User{Name: "root", Password: "123456"})
-	//controller.GetDB().Model(&model.Post{}).AddForeignKey("author_id","users(id)","RESTRICT","RESTRICT")
+	//controller.GetDB().Model(&model.Article{}).AddForeignKey("author_id","users(id)","RESTRICT","RESTRICT")
 	return nil
 }
 func GetRoutes() []Route {

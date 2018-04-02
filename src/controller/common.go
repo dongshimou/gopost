@@ -31,8 +31,8 @@ func InitDB() error {
 	}
 	db = db.Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8 auto_increment=1")
 
-	if db.HasTable(&model.Post{}) == false {
-		db = db.CreateTable(&model.Post{})
+	if db.HasTable(&model.Article{}) == false {
+		db = db.CreateTable(&model.Article{})
 	}
 	if db.HasTable(&model.Replay{}) == false {
 		db = db.CreateTable(&model.Replay{})

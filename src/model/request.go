@@ -10,7 +10,7 @@ type REQGetArticle struct {
 	ID    string `json:"id" form:"title"`
 }
 type REQNewReplay struct {
-	Aid string `json:"aid" form:"aid"`
+	Aid     string `json:"aid" form:"aid"`
 	Context string `json:"context" form:"context"`
 }
 type REQLogin struct {

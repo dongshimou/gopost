@@ -11,7 +11,7 @@ func isNullOrEmpty(v interface{}) bool {
 func parse2uint(s string) (uint, error) {
 	return utility.Parse2Uint(s)
 }
-func parseID(s string)(uint ,error){
+func parseID(s string) (uint, error) {
 	return parse2uint(s)
 }
 

@@ -1,9 +1,9 @@
 package service
 
 import (
-	"utility"
 	"controller"
 	"model"
+	"utility"
 )
 
 func NewPost(req *model.REQNewArticle) error {
@@ -15,15 +15,15 @@ func NewPost(req *model.REQNewArticle) error {
 
 	tags := []*model.Tag{}
 	for i, _ := range req.Tag {
-		t:=model.Tag{Name: req.Tag[i],}
-		db.FirstOrCreate(&t,&t)
-		tags = append(tags,&t )
+		t := model.Tag{Name: req.Tag[i]}
+		db.FirstOrCreate(&t, &t)
+		tags = append(tags, &t)
 	}
 
 	if db.Where(&user).First(&user).Error != nil {
 		return db.Error
 	}
-	post := model.Post{
+	post := model.Article{
 		Title:    req.Title,
 		Context:  req.Context,
 		Tags:     tags,
@@ -46,7 +46,7 @@ commit:
 	return nil
 }
 func GetPost(req *model.REQGetArticle) (*model.RESGetArticle, error) {
-	post := model.Post{}
+	post := model.Article{}
 	if !isNullOrEmpty(req.ID) {
 		id, err := parseID(req.ID)
 		if err != nil {
@@ -92,28 +92,28 @@ query:
 	return &res, nil
 }
 
-func NewReplay(req *model.REQNewReplay)(err error) {
+func NewReplay(req *model.REQNewReplay) (err error) {
 	if isNullOrEmpty(req.Aid) || isNullOrEmpty(req.Context) {
-return utility.NewError(utility.ERROR_REQUEST_CODE, utility.ERROR_REQUEST_MSG)
+		return utility.NewError(utility.ERROR_REQUEST_CODE, utility.ERROR_REQUEST_MSG)
 	}
 	aid, err := parseID(req.Aid)
 	if err != nil {
 		return err
 	}
-	db:=controller.GetDB()
-	user:=model.User{
-		Name:"root",
+	db := controller.GetDB()
+	user := model.User{
+		Name: "root",
 	}
-	if err=db.Model(&user).Where(&user).First(&user).Error;err!=nil{
+	if err = db.Model(&user).Where(&user).First(&user).Error; err != nil {
 		return err
 	}
-	replay:=model.Replay{
-		PostID:aid,
-		UserID:user.ID,
-		Context:req.Context,
+	replay := model.Replay{
+		ArticleID: aid,
+		UserID:    user.ID,
+		Context:   req.Context,
 	}
-	tx:=db.Begin()
-	if err=tx.Save(&replay).Error;err!=nil{
+	tx := db.Begin()
+	if err = tx.Save(&replay).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
