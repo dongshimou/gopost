@@ -7,10 +7,9 @@ import (
 	"service"
 )
 
-func NewReplay(c *gin.Context) {
+func PostNewReplay(c *gin.Context) {
 	var req model.REQNewReplay
 
-	req.Aid = c.Param("aid")
 	err := c.Bind(&req)
 	if err != nil {
 		log.Print(err)
@@ -22,6 +21,38 @@ func NewReplay(c *gin.Context) {
 		return
 	}
 	DoResponseOK(c, nil)
+}
+func GetReplays(c *gin.Context) {
+	var req model.REQGetReplays
+
+	req.Title = c.Param("title")
+	err := c.Bind(&req)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	res, err := service.GetArticleReplays(&req)
+	if err != nil {
+		DoResponseFail(c, err)
+		return
+	}
+	DoResponseOK(c, res)
+}
+func GetUserInfo(c *gin.Context) {
+	var req model.REQGetUserInfo
+	req.Username = c.Param("username")
+
+	err := c.Bind(&req)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	res, err := service.GetUserInfo(&req)
+	if err != nil {
+		DoResponseFail(c, err)
+		return
+	}
+	DoResponseOK(c, res)
 }
 func GetArticle(c *gin.Context) {
 	var req model.REQGetArticle
@@ -40,16 +71,14 @@ func GetArticle(c *gin.Context) {
 	}
 	DoResponseOK(c, res)
 }
-func NewPost(c *gin.Context) {
+func PostNewArticle(c *gin.Context) {
 	var req model.REQNewArticle
-
 	err := c.Bind(&req)
-
 	if err != nil {
 		log.Print(err)
 		return
 	}
-	err = service.NewPost(&req)
+	err = service.PostNewArticle(&req)
 	if err != nil {
 		DoResponseFail(c, err)
 		return

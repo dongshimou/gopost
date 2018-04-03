@@ -7,6 +7,7 @@ import (
 	"handler"
 	"model"
 	"net/http"
+	"utility"
 )
 
 func InitV1() error {
@@ -14,8 +15,10 @@ func InitV1() error {
 	if err != nil {
 		return err
 	}
-	controller.GetDB().Create(&model.User{Name: "root", Password: "123456"})
-	//controller.GetDB().Model(&model.Article{}).AddForeignKey("author_id","users(id)","RESTRICT","RESTRICT")
+
+	//for test
+	controller.GetDB().Create(&model.User{Name: "root", Password: "123456", Permission: 0x1111})
+
 	return nil
 }
 func GetRoutes() []Route {
@@ -25,53 +28,67 @@ func Fail(c *gin.Context) {
 	c.JSON(
 		http.StatusOK,
 		map[string]interface{}{
-			"code": 1004,
-			"msg":  "权限错误",
+			"code": utility.ERROR_AUTH_CODE,
+			"msg":  utility.ERROR_AUTH_MSG,
 			"data": nil,
 		})
 }
 
 var routes = []Route{
 	Route{
-		"NewPost",
+		"PostNewArticle",
 		"POST",
-		"/v1/new",
-		handler.NewPost,
+		"/v1/article",
+		handler.PostNewArticle,
 		nil,
 	},
 	Route{
-		"Login",
+		"Signin",
 		"POST",
-		"/v1/login",
-		handler.Login,
+		"/v1/sign/in",
+		handler.Signin,
 		nil,
 	},
 	Route{
-		"Logout",
+		"SignOut",
 		"GET",
-		"/v1/logout",
-		handler.Logout,
+		"/v1/sign/out",
+		handler.SignOut,
 		nil,
 	},
 	Route{
 		"SignUp",
 		"POST",
-		"/v1/signup",
+		"/v1/sign/up",
 		handler.SignUp,
 		nil,
 	},
 	Route{
 		"GetArticle",
 		"GET",
-		"/v1/post/:title",
+		"/v1/article/:title",
 		handler.GetArticle,
 		nil,
 	},
 	Route{
-		"NewReplay",
+		"PostNewReplay",
 		"POST",
-		"/v1/replay/:aid",
-		handler.NewReplay,
+		"/v1/replay",
+		handler.PostNewReplay,
+		nil,
+	},
+	Route{
+		"GetReplay",
+		"GET",
+		"/v1/replay/:title",
+		handler.GetReplays,
+		nil,
+	},
+	Route{
+		"GetUserInfo",
+		"GET",
+		"/v1/user/:username",
+		handler.GetUserInfo,
 		nil,
 	},
 }

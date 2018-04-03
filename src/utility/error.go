@@ -17,6 +17,9 @@ const (
 
 	ERROR_REQUEST_CODE = 1003
 	ERROR_REQUEST_MSG  = "请求错误"
+
+	ERROR_AUTH_CODE =1004
+	ERROR_AUTH_MSG="权限错误"
 )
 
 type InnerError struct {

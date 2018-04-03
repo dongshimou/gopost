@@ -1,7 +1,5 @@
 package model
 
-import "time"
-
 type Response struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
@@ -12,11 +10,40 @@ type RESLogin struct {
 }
 
 type RESGetArticle struct {
-	Aid            uint      `json:"aid"`
-	Title          string    `json:"title"`
-	Author         string    `json:"author"`
-	Tags           []string  `json:"tags"`
-	Context        string    `json:"context"`
-	CreateDatetime time.Time `json:"create_datetime" time_format:"2006-01-02 15:04:05" time_utc:"1" `
-	EditDatetime   time.Time `json:"edit_datetime" time_format:"2006-01-02 15:04:05" time_utc:"1" `
+	Aid            uint     `json:"aid"`
+	Title          string   `json:"title"`
+	Author         string   `json:"author"`
+	Tags           []string `json:"tags"`
+	Context        string   `json:"context"`
+	CreateDatetime string   `json:"create_datetime"`
+	EditDatetime   string   `json:"edit_datetime"`
+}
+
+type RESGetReplays struct {
+	Aid          uint   `json:"aid"`
+	ArticleTitle string `json:"article_title"`
+	Replays      []struct {
+		Rid            uint   `json:"rid"`
+		Username       string `json:"username"`
+		Context        string `json:"context"`
+		CreateDatetime string `json:"create_datetime"`
+	} `json:"replays"`
+}
+
+type RESGetUserInfo struct {
+	Uid            uint   `json:"uid"`
+	Username       string `json:"username"`
+	Email          string `json:"email"`
+	Permission     int    `json:"permission"`
+	CreateDatetime string `json:"create_datetime"`
+	UpdateDatetime string `json:"update_datetime"`
+	PostArticle    []struct {
+		Title          string `json:"title"`
+		CreateDatetime string `json:"create_datetime"`
+	} `json:"post_article"`
+	PostReplay []struct {
+		Title          string `json:"title"`
+		Replay         string `json:"replay"`
+		CreateDatetime string `json:"create_datetime"`
+	} `json:"post_replay"`
 }

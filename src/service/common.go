@@ -2,6 +2,7 @@ package service
 
 import (
 	"model"
+	"time"
 	"utility"
 )
 
@@ -13,6 +14,9 @@ func parse2uint(s string) (uint, error) {
 }
 func parseID(s string) (uint, error) {
 	return parse2uint(s)
+}
+func formatDatetime(time time.Time) string {
+	return utility.FormatDatetime(time)
 }
 
 func Login(req *model.REQLogin) (*model.RESLogin, error) {

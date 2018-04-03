@@ -136,3 +136,12 @@ func formatDateTime(t time.Time) string {
 func formatDate(t time.Time) string {
 	return t.Format("2006-01-02")
 }
+
+func VerifyPermission(up int,nps ...int)error{
+	for _,np:=range nps{
+		if up&np<=0{
+			return NewError(ERROR_AUTH_CODE,ERROR_AUTH_MSG)
+		}
+	}
+	return nil
+}

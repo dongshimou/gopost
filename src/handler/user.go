@@ -7,7 +7,7 @@ import (
 	"service"
 )
 
-func Login(c *gin.Context) {
+func Signin(c *gin.Context) {
 	var req model.REQLogin
 
 	err := c.Bind(&req)
@@ -23,7 +23,7 @@ func Login(c *gin.Context) {
 	}
 	DoResponseOK(c, res)
 }
-func Logout(c *gin.Context) {
+func SignOut(c *gin.Context) {
 
 	DoResponseOK(c, nil)
 }
