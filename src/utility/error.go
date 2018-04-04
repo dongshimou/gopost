@@ -36,6 +36,7 @@ const (
 	ERROR_MSG_AUTH_TOKEN_KNOW_ERROR     = "解析token失败"
 	ERROR_MSG_AUTH_TOKEN_EXP_ERROR      = "从token获取时间失败"
 	ERROR_MSG_AUTH_TOKEN_USERNAME_ERROR = "从token获取用户失败"
+	ERROR_MSG_AUTH_TOKEN_NOT_EXIST      = "未找到token"
 )
 
 type InnerError struct {

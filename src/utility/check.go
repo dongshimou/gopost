@@ -54,15 +54,6 @@ func IsNullorEmpty(para interface{}) bool {
 	return false
 }
 
-func VerifyPermission(up int, nps ...int) error {
-	for _, np := range nps {
-		if up&np <= 0 {
-			return NewError(ERROR_AUTH_CODE, ERROR_AUTH_MSG)
-		}
-	}
-	return nil
-}
-
 func VerifyUsername(username string) error {
 	l := len(username)
 	if l < 6 || l > 30 {

@@ -43,7 +43,7 @@ commit:
 	tx.Commit()
 	return nil
 }
-func GetPost(req *model.REQGetArticle) (*model.RESGetArticle, error) {
+func GetArticle(req *model.REQGetArticle) (*model.RESGetArticle, error) {
 	article := model.Article{}
 	if !isNullOrEmpty(req.Aid) {
 		aid, err := parseID(req.Aid)
@@ -89,7 +89,20 @@ query:
 	}
 	return &res, nil
 }
+func DelArticle(req *model.REQDelArticle) (err error) {
 
+	article := model.Article{}
+
+	article.Title = req.Title
+	tx := controller.GetDB().Begin()
+
+	if err = tx.Model(&article).Where(&article).Delete(&article).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
+}
 func NewReplay(req *model.REQNewReplay) (err error) {
 	if isNullOrEmpty(req.Title) || isNullOrEmpty(req.Context) {
 		return utility.NewError(utility.ERROR_REQUEST_CODE, utility.ERROR_REQUEST_MSG)

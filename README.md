@@ -7,4 +7,6 @@
 
 ## how to run
 1. init your `./bin/product.json`
-2. `sudo bash ./tool/govendor.sh`
+1. create a database named after `product.json -> database -> database`
+and a mysql user
+1. `sudo bash ./tool/govendor.sh`

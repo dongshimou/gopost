@@ -38,6 +38,8 @@ func StartService() {
 			router.GET(pattern, hanlders...)
 		case "POST":
 			router.POST(pattern, hanlders...)
+		case "DELETE":
+			router.DELETE(pattern, hanlders...)
 		}
 	}
 	router.Run(":" + GetConfig().Server.Port)

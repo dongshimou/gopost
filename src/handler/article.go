@@ -43,7 +43,6 @@ func GetReplays(c *gin.Context) {
 
 fail:
 	DoResponseFail(c, err)
-
 }
 func GetUserInfo(c *gin.Context) {
 	var req model.REQGetUserInfo
@@ -78,7 +77,7 @@ func GetArticle(c *gin.Context) {
 	if err = c.Bind(&req); err != nil {
 		goto fail
 	}
-	if res, err = service.GetPost(&req); err != nil {
+	if res, err = service.GetArticle(&req); err != nil {
 		goto fail
 	}
 	DoResponseOK(c, res)
@@ -99,6 +98,24 @@ func PostArticle(c *gin.Context) {
 	if err = service.PostNewArticle(&req); err != nil {
 		goto fail
 
+	}
+	DoResponseOK(c, nil)
+	return
+fail:
+	DoResponseFail(c, err)
+}
+func DelArticle(c *gin.Context) {
+	var req model.REQDelArticle
+	var err error
+	if req.CurrUser, err = getCurrUser(c); err != nil {
+		goto fail
+	}
+	req.Title = c.Param("title")
+	if err = c.Bind(&req); err != nil {
+		goto fail
+	}
+	if err = service.DelArticle(&req); err != nil {
+		goto fail
 	}
 	DoResponseOK(c, nil)
 	return

@@ -17,7 +17,23 @@ func InitV1() error {
 	}
 
 	if logger.DEBUG {
-		controller.GetDB().Create(&model.User{Name: "root", Password: "123456", Permission: 0x1111})
+		controller.GetDB().Create(&model.User{
+			Name:     "root",
+			Password: "123456",
+			Permission: utility.CreatePermission(
+				model.Article_Read,
+				model.Article_Update,
+				model.Article_Delete,
+				model.Article_Create,
+				model.Replay_Read,
+				model.Replay_Update,
+				model.Replay_Delete,
+				model.Replay_Create,
+				model.User_Read,
+				model.User_Update,
+				model.User_Delete,
+				model.User_Create,
+			)})
 	}
 
 	return nil
@@ -27,21 +43,13 @@ func GetRoutes() []Route {
 	return routes
 }
 func MakeAuth(prems ...int) gin.HandlersChain {
-	return MakeHandler(handler.AuthDecorator(GetUserFromToken, Fail, prems...))
-}
-func Fail(c *gin.Context, err error) {
-	if err == nil {
-		handler.DoResponseFail(c, utility.NewError(utility.ERROR_AUTH_CODE, utility.ERROR_AUTH_MSG))
-	} else {
-		handler.DoResponseFail(c, err)
-	}
+	return MakeHandler(handler.AuthDecorator(GetUserFromToken, prems...))
 }
 func GetUserFromToken(token string) (*model.User, error) {
 	user := &model.User{}
 	var err error
 	if logger.DEBUG {
 		user.Name = "root"
-
 	} else {
 		if user.Name, err = utility.ParseToken(token); err != nil {
 			return nil, err
@@ -68,6 +76,13 @@ var routes = []Route{
 		"/v1/article/:title",
 		handler.GetArticle,
 		MakeAuth(model.Article_Read),
+	},
+	Route{
+		"DelArticle",
+		"DELETE",
+		"/v1/article/:title",
+		handler.DelArticle,
+		MakeAuth(model.Article_Delete),
 	},
 	Route{
 		"PostReplay",

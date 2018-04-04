@@ -54,6 +54,12 @@ func SignUp(req *model.REQSignUp) (*model.RESSignUp, error) {
 	user.Email = req.Email
 	user.SignUpIP = req.IP
 
+	user.Permission = utility.CreatePermission(
+		model.Article_Read,
+		model.Replay_Read,
+		model.Replay_Create,
+		model.Replay_Update,
+	)
 	db := controller.GetDB()
 
 	count := 0

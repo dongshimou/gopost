@@ -52,54 +52,36 @@ func DoResponseOK(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, res)
 }
 
-func AuthDecorator(getToken func(string) (*model.User, error), fail func(c *gin.Context, err error), prems ...int) gin.HandlerFunc {
-	if fail == nil {
-		panic("fail: func fail must be implemented!")
-	}
-
+func AuthDecorator(getToken func(string) (*model.User, error), prems ...int) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var token string
-
 		c.Request.ParseForm()
-
 		if token = c.Request.Header.Get("X-User-Token"); len(token) > 0 {
 		} else if token = c.Request.Header.Get("USER-TOKEN"); len(token) > 0 {
 		} else if token = c.PostForm("user_token"); len(token) > 0 {
 		} else if token = c.Query("user_token"); len(token) > 0 {
 		} else if token, _ = c.Cookie("user_auth_token"); len(token) > 0 {
 		} else {
-			log.Println("user: token is not avilable!")
-			fail(c, nil)
+			log.Println(utility.ERROR_MSG_AUTH_TOKEN_NOT_EXIST)
+			DoResponseFail(c, utility.NewError(utility.ERROR_AUTH_CODE, utility.ERROR_MSG_AUTH_TOKEN_NOT_EXIST))
 			c.Abort()
 			return
 		}
-
-		logger.Debug("user token : ", token)
-
+		logger.Print("user token : ", token)
 		user, err := getToken(token)
 		if err != nil {
-			fail(c, nil)
+			DoResponseFail(c, err)
 			c.Abort()
 			return
 		}
-		if user == nil {
-			log.Println("user: token is invalid!")
-			fail(c, nil)
-			c.Abort()
-			return
-		}
-
 		//验证权限
 		if err := utility.VerifyPermission(user.Permission, prems...); err != nil {
-			fail(c, err)
+			DoResponseFail(c, err)
 			c.Abort()
 			return
 		}
-
-		logger.Debug("user info: ", user)
-
+		logger.Print("user info: ", user)
 		c.Set("curr_user", user)
-
 		c.Next()
 		return
 	}

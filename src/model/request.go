@@ -11,6 +11,10 @@ type REQGetArticle struct {
 	Aid      string `form:"aid"`
 	CurrUser *User  `form:"curr_user"`
 }
+type REQDelArticle struct {
+	Title    string `form:"title" url:"title"`
+	CurrUser *User  `form:"curr_user"`
+}
 type REQNewReplay struct {
 	Aid      string `json:"aid" form:"aid"`
 	Title    string `json:"title" form:"title"`

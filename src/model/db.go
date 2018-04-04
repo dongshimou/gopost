@@ -55,11 +55,17 @@ type User struct {
 
 const (
 	Replay_Read   = 1
-	Replay_Create = 1
+	Replay_Create = 1 << 1
+	Replay_Delete = 1 << 2
+	Replay_Update = 1 << 3
 
-	Article_Read   = 1
-	Article_Create = 1 << 1
+	Article_Read   = 1 << 4
+	Article_Create = 1 << 5
+	Article_Delete = 1 << 6
+	Article_Update = 1 << 7
 
-	User_Read   = 1
-	User_Create = 1 << 2
+	User_Read   = 1 << 8
+	User_Create = 1 << 9
+	User_Delete = 1 << 10
+	User_Update = 1 << 11
 )
