@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"base"
 	"github.com/gin-gonic/gin"
 	"log"
 	"logger"
@@ -51,7 +52,7 @@ func DoResponseOK(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, res)
 }
 
-func AuthDecorator(getToken func(string) *model.User, fail gin.HandlerFunc, prems ...int) gin.HandlerFunc {
+func AuthDecorator(getToken func(string) (*model.User, error), fail func(c *gin.Context, err error), prems ...int) gin.HandlerFunc {
 	if fail == nil {
 		panic("fail: func fail must be implemented!")
 	}
@@ -68,24 +69,29 @@ func AuthDecorator(getToken func(string) *model.User, fail gin.HandlerFunc, prem
 		} else if token, _ = c.Cookie("user_auth_token"); len(token) > 0 {
 		} else {
 			log.Println("user: token is not avilable!")
-			fail(c)
+			fail(c, nil)
 			c.Abort()
 			return
 		}
 
 		logger.Debug("user token : ", token)
 
-		user := getToken(token)
+		user, err := getToken(token)
+		if err != nil {
+			fail(c, nil)
+			c.Abort()
+			return
+		}
 		if user == nil {
 			log.Println("user: token is invalid!")
-			fail(c)
+			fail(c, nil)
 			c.Abort()
 			return
 		}
 
 		//验证权限
 		if err := utility.VerifyPermission(user.Permission, prems...); err != nil {
-			fail(c)
+			fail(c, err)
 			c.Abort()
 			return
 		}
@@ -99,6 +105,15 @@ func AuthDecorator(getToken func(string) *model.User, fail gin.HandlerFunc, prem
 	}
 }
 
+func setHeaderToken(c *gin.Context, token string) {
+	//cookie:=http.Cookie{
+	//Name:"USER-TOKEN",
+	//Value:res,
+	//Expires:exp,
+	//}
+	//http.SetCookie(c.Writer,&cookie)
+	c.SetCookie("USER-TOKEN", token, int(base.GetConfig().Token.TTL), "", "", false, false)
+}
 func getCurrUser(c *gin.Context) (*model.User, error) {
 	if a, ok1 := c.Get("curr_user"); ok1 {
 		if user, ok2 := a.(*model.User); ok2 {

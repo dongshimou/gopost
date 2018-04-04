@@ -9,6 +9,7 @@ import (
 type Configs struct {
 	Database Database `json:"database"`
 	Server   Server   `json:"server"`
+	Token    Token    `json:"token"`
 }
 type Database struct {
 	Host     string `json:"host"`
@@ -19,6 +20,10 @@ type Database struct {
 }
 type Server struct {
 	Port string `json:"port"`
+}
+type Token struct {
+	SecretKey string `json:"secret_key"`
+	TTL       int64  `json:"ttl"`
 }
 
 var (

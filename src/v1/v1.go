@@ -29,21 +29,29 @@ func GetRoutes() []Route {
 func MakeAuth(prems ...int) gin.HandlersChain {
 	return MakeHandler(handler.AuthDecorator(GetUserFromToken, Fail, prems...))
 }
-func Fail(c *gin.Context) {
-	handler.DoResponseFail(c, utility.NewError(utility.ERROR_AUTH_CODE, utility.ERROR_AUTH_MSG))
+func Fail(c *gin.Context, err error) {
+	if err == nil {
+		handler.DoResponseFail(c, utility.NewError(utility.ERROR_AUTH_CODE, utility.ERROR_AUTH_MSG))
+	} else {
+		handler.DoResponseFail(c, err)
+	}
 }
-func GetUserFromToken(token string) *model.User {
+func GetUserFromToken(token string) (*model.User, error) {
 	user := &model.User{}
-
+	var err error
 	if logger.DEBUG {
 		user.Name = "root"
-		db := controller.GetDB()
-		if err := db.Model(user).Where(user).First(user).Error; err != nil {
-			return nil
+
+	} else {
+		if user.Name, err = utility.ParseToken(token); err != nil {
+			return nil, err
 		}
 	}
-
-	return user
+	db := controller.GetDB()
+	if err = db.Model(user).Where(user).First(user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 var routes = []Route{
@@ -103,6 +111,13 @@ var routes = []Route{
 		"POST",
 		"/v1/sign/up",
 		handler.SignUp,
+		nil,
+	},
+	Route{
+		"SignVerify",
+		"GET",
+		"/v1/sign/verify",
+		handler.SignVerify,
 		nil,
 	},
 }

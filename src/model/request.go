@@ -29,12 +29,12 @@ type REQGetUserInfo struct {
 }
 
 type REQSignin struct {
-	Username string `json:"username" form:"username"`
-	Password string `json:"password" form:"password"`
-	IP       string `json:"ip" form:"ip"`
+	Username string `json:"username" form:"username" binding:"required"`
+	Password string `json:"password" form:"password" binding:"required"`
+	IP       string
 }
 
 type REQSignUp struct {
 	REQSignin
-	Email string `json:"email"`
+	Email string `json:"email" form:"email" binding:"required,email"`
 }

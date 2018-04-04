@@ -21,7 +21,21 @@ const (
 	ERROR_AUTH_CODE = 1004
 	ERROR_AUTH_MSG  = "权限错误"
 
-	ERROR_MSG_UNKNOW_USER = "未知用户"
+	ERROR_CONVER_CODE = 1005
+	ERROR_CONVER_MSG  = "类型转换错误"
+
+	ERROR_MSG_UNKNOW_USER       = "未知用户"
+	ERROR_MSG_EXIST_USERNAME    = "已存在的用户名"
+	ERROR_MSG_ERROR_USERNAME    = "错误的用户名"
+	ERROR_MSG_LENGTH_USERNAME   = "用户名长度应为6-30个字符"
+	ERROR_MSG_ERROR_PASSWORD    = "密码错误"
+	ERROR_MSG_ERROR_TOKEN_SIGN  = "认证签名错误"
+	ERROR_MSG_ERROR_SIGN_METHOD = "错误的签名方式"
+	ERROR_MSG_AUTH_TIMEOUT      = "认证超时,请重新登录"
+
+	ERROR_MSG_AUTH_TOKEN_KNOW_ERROR     = "解析token失败"
+	ERROR_MSG_AUTH_TOKEN_EXP_ERROR      = "从token获取时间失败"
+	ERROR_MSG_AUTH_TOKEN_USERNAME_ERROR = "从token获取用户失败"
 )
 
 type InnerError struct {
@@ -36,9 +50,9 @@ func (*InnerError) New(code int, msg string, args ...interface{}) *InnerError {
 		file = "???"
 		line = 0
 	}
-	msg = fmt.Sprintf("%s ", msg)
+	msg = fmt.Sprintf("%s", msg)
 	for _, v := range args {
-		msg += fmt.Sprintf("%v", v)
+		msg += fmt.Sprintf(" %v", v)
 	}
 	return &InnerError{
 		Code: code,
@@ -56,7 +70,6 @@ func Wrap(err error, code int, msg string, args ...interface{}) *InnerError {
 	}
 	v, ok := err.(*InnerError)
 	if ok {
-		args = append(args, msg)
 		return NewError(v.Code, v.Msg, args...)
 	} else {
 		return NewError(code, msg, args...)

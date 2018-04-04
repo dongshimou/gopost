@@ -46,18 +46,20 @@ type User struct {
 	Email      string    `gorm:"size:255;unique;"`
 	Password   string    `gorm:"size:128;"`
 	Permission int       `gorm:"default:1;"`
-	Token      string    `gorm:"size:2048;"`
 	Articles   []Article `gorm:"FOREIGNKEY:AuthorID;"`
 	Replays    []Replay  `gorm:"FOREIGNKEY:AuthorName;"`
+
+	SignInIP string `gorm:"size:128"`
+	SignUpIP string `gorm:"size:128"`
 }
 
 const (
-	Replay_Read   = 0
+	Replay_Read   = 1
 	Replay_Create = 1
 
 	Article_Read   = 1
 	Article_Create = 1 << 1
 
-	User_Read   = 0
+	User_Read   = 1
 	User_Create = 1 << 2
 )

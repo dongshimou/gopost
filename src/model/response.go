@@ -7,6 +7,12 @@ type Response struct {
 }
 
 type RESSignIn struct {
+	Uid            uint   `json:"uid"`
+	Username       string `json:"username"`
+	Token          string `json:"token"`
+	Permission     int    `json:"permission"`
+	CreateDatetime string `json:"create_datetime"`
+	UpdateDatetime string `json:"update_datetime"`
 }
 type RESSignUp struct {
 }
