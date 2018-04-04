@@ -7,6 +7,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"log"
 	"model"
+	"logger"
 )
 
 var (
@@ -19,6 +20,7 @@ func GetDB() *gorm.DB {
 func InitDB() error {
 	var err error
 	cfg := base.GetConfig().Database
+	logger.Print(cfg)
 	args := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		cfg.Username, cfg.Password, cfg.Host, cfg.Port, cfg.Database)
 	db, err = gorm.Open("mysql", args)

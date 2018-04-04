@@ -26,7 +26,7 @@ func SignIn(req *model.REQSignin) (*model.RESSignIn, error) {
 		return nil, utility.NewError(utility.ERROR_AUTH_CODE, utility.ERROR_MSG_ERROR_PASSWORD)
 	}
 	user.SignInIP = req.IP
-	if err = db.Model(&user).Where(model.User{Name:user.Name}).Update(user).Error; err != nil {
+	if err = db.Model(&user).Where(model.User{Name: user.Name}).Update(user).Error; err != nil {
 		return nil, err
 	}
 	res := model.RESSignIn{}

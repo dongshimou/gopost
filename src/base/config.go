@@ -3,7 +3,7 @@ package base
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
+	"logger"
 )
 
 type Configs struct {
@@ -36,16 +36,29 @@ func init() {
 func GetConfig() *Configs {
 	return gConfig
 }
+func read() ([]byte, error) {
+	if logger.DEBUG {
+		file, err := ioutil.ReadFile("./develop.json")
+		if err != nil {
+			logger.Debug("can't find config : develop.json")
+		} else {
+			return file, err
+		}
+	}
+	logger.Print("=== read product config ===")
+	return ioutil.ReadFile("./product.json")
+}
 func readConfig() {
-	file, err := ioutil.ReadFile("./config.json")
+	file, err := read()
 	if err != nil {
-		log.Print(err)
+		logger.Print(err)
+		logger.Error("=== read config fail===")
 		return
 	}
 	c := Configs{}
 	err = json.Unmarshal(file, &c)
 	if err != nil {
-		log.Print(err)
+		logger.Print(err)
 	}
 	gConfig = &c
 }

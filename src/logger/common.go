@@ -12,11 +12,15 @@ func SetDebug() {
 
 func Debug(args ...interface{}) {
 	if DEBUG {
-		log.Print(args...)
+		log.Println(args...)
 	}
 }
 
 func Error(args ...interface{}) {
-	log.Print(args...)
+	log.Println(args...)
 	//发送警报
+}
+
+func Print(args ...interface{}) {
+	log.Println(args...)
 }

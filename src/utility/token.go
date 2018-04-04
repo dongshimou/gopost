@@ -36,10 +36,10 @@ func ParseToken(raw string) (string, error) {
 }
 
 func GenerateToken(username string) (res string, err error) {
-	tconfig:=base.GetConfig().Token
+	tconfig := base.GetConfig().Token
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := make(jwt.MapClaims)
-	exp := time.Now().Add(time.Second*time.Duration(tconfig.TTL))
+	exp := time.Now().Add(time.Second * time.Duration(tconfig.TTL))
 	claims["username"] = username
 	claims["exp"] = exp.Unix()
 	claims["iat"] = time.Now().Unix()
