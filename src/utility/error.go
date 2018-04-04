@@ -18,8 +18,10 @@ const (
 	ERROR_REQUEST_CODE = 1003
 	ERROR_REQUEST_MSG  = "请求错误"
 
-	ERROR_AUTH_CODE =1004
-	ERROR_AUTH_MSG="权限错误"
+	ERROR_AUTH_CODE = 1004
+	ERROR_AUTH_MSG  = "权限错误"
+
+	ERROR_MSG_UNKNOW_USER = "未知用户"
 )
 
 type InnerError struct {
@@ -28,21 +30,25 @@ type InnerError struct {
 	Pos  string
 }
 
-func (*InnerError) New(code int, args ...interface{}) *InnerError {
+func (*InnerError) New(code int, msg string, args ...interface{}) *InnerError {
 	_, file, line, ok := runtime.Caller(2)
 	if !ok {
 		file = "???"
 		line = 0
 	}
+	msg = fmt.Sprintf("%s ", msg)
+	for _, v := range args {
+		msg += fmt.Sprintf("%v", v)
+	}
 	return &InnerError{
 		Code: code,
-		Msg:  fmt.Sprintf("%v", args...),
+		Msg:  msg,
 		Pos:  fmt.Sprintf("%s %d", file, line),
 	}
 }
 func NewError(code int, msg string, args ...interface{}) *InnerError {
 	s := InnerError{}
-	return s.New(code, args...)
+	return s.New(code, msg, args...)
 }
 func Wrap(err error, code int, msg string, args ...interface{}) *InnerError {
 	if err == nil {

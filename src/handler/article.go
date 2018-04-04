@@ -2,86 +2,106 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 	"model"
 	"service"
 )
 
-func PostNewReplay(c *gin.Context) {
+func PostReplay(c *gin.Context) {
 	var req model.REQNewReplay
-
-	err := c.Bind(&req)
-	if err != nil {
-		log.Print(err)
-		return
+	var err error
+	if req.CurrUser, err = getCurrUser(c); err != nil {
+		goto fail
 	}
-	err = service.NewReplay(&req)
-	if err != nil {
-		DoResponseFail(c, err)
-		return
+	if err = c.Bind(&req); err != nil {
+		goto fail
+	}
+	if err = service.NewReplay(&req); err != nil {
+		goto fail
 	}
 	DoResponseOK(c, nil)
+	return
+
+fail:
+	DoResponseFail(c, err)
 }
 func GetReplays(c *gin.Context) {
 	var req model.REQGetReplays
-
+	var res *model.RESGetReplays
+	var err error
 	req.Title = c.Param("title")
-	err := c.Bind(&req)
-	if err != nil {
-		log.Print(err)
-		return
+	if req.CurrUser,err=getCurrUser(c);err!=nil{
+		goto fail
 	}
-	res, err := service.GetArticleReplays(&req)
-	if err != nil {
-		DoResponseFail(c, err)
-		return
+	if err = c.Bind(&req); err != nil {
+		goto fail
+	}
+	if res, err = service.GetArticleReplays(&req); err != nil {
+		goto fail
 	}
 	DoResponseOK(c, res)
+	return
+
+fail:
+	DoResponseFail(c, err)
+
 }
 func GetUserInfo(c *gin.Context) {
 	var req model.REQGetUserInfo
+	var res *model.RESGetUserInfo
+	var err error
 	req.Username = c.Param("username")
-
-	err := c.Bind(&req)
-	if err != nil {
-		log.Print(err)
-		return
+	if req.CurrUser,err=getCurrUser(c);err!=nil{
+		goto fail
 	}
-	res, err := service.GetUserInfo(&req)
-	if err != nil {
-		DoResponseFail(c, err)
-		return
+	if err = c.Bind(&req); err != nil {
+		goto fail
+	}
+	if res, err = service.GetUserInfo(&req); err != nil {
+		goto fail
 	}
 	DoResponseOK(c, res)
+	return
+
+fail:
+	DoResponseFail(c, err)
+
 }
 func GetArticle(c *gin.Context) {
 	var req model.REQGetArticle
-
+	var res *model.RESGetArticle
+	var err error
 	req.Title = c.Param("title")
 	// 等待 gin 的bind url 功能
-	err := c.Bind(&req)
-	if err != nil {
-		log.Print(err)
-		return
+	if req.CurrUser,err=getCurrUser(c);err!=nil{
+	goto fail
 	}
-	res, err := service.GetPost(&req)
-	if err != nil {
-		DoResponseFail(c, err)
-		return
+	if err = c.Bind(&req); err != nil {
+		goto fail
+	}
+	if res, err = service.GetPost(&req); err != nil {
+		goto fail
 	}
 	DoResponseOK(c, res)
+	return
+
+fail:
+	DoResponseFail(c, err)
 }
-func PostNewArticle(c *gin.Context) {
+func PostArticle(c *gin.Context) {
 	var req model.REQNewArticle
-	err := c.Bind(&req)
-	if err != nil {
-		log.Print(err)
-		return
+	var err error
+	if req.CurrUser,err=getCurrUser(c);err!=nil{
+		goto fail
 	}
-	err = service.PostNewArticle(&req)
-	if err != nil {
-		DoResponseFail(c, err)
-		return
+	if err = c.Bind(&req); err != nil {
+		goto fail
+	}
+	if err = service.PostNewArticle(&req); err != nil {
+		goto fail
+
 	}
 	DoResponseOK(c, nil)
+	return
+fail:
+	DoResponseFail(c, err)
 }

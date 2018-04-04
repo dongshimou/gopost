@@ -52,10 +52,12 @@ type User struct {
 }
 
 const (
-	Article_PermissionRead   = 0x0000
-	Article_PermissionCreate = 0x0010
-	Replay_PermissionRead    = 0x0000
-	Replay_PermissionCreate  = 0x0001
-	User_PermissionRead = 0x0000
-	User_PermissionCreate = 0x0100
+	Replay_Read   = 0
+	Replay_Create = 1
+
+	Article_Read   = 1
+	Article_Create = 1 << 1
+
+	User_Read   = 0
+	User_Create = 1 << 2
 )

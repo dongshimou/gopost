@@ -6,9 +6,10 @@ type Response struct {
 	Data interface{} `json:"data"`
 }
 
-type RESLogin struct {
+type RESSignIn struct {
 }
-
+type RESSignUp struct {
+}
 type RESGetArticle struct {
 	Aid            uint     `json:"aid"`
 	Title          string   `json:"title"`

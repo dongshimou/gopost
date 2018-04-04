@@ -2,32 +2,52 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 	"model"
 	"service"
 )
 
-func Signin(c *gin.Context) {
-	var req model.REQLogin
-
-	err := c.Bind(&req)
-
-	if err != nil {
-		log.Print(err)
-		return
+func SignIn(c *gin.Context) {
+	var req model.REQSignin
+	var res *model.RESSignIn
+	var err error
+	if err = c.Bind(&req); err != nil {
+		goto fail
 	}
-	res, err := service.Login(&req)
-	if err != nil {
-		DoResponseFail(c, err)
-		return
+
+	if res, err = service.SignIn(&req); err != nil {
+		goto fail
 	}
+
 	DoResponseOK(c, res)
+	return
+
+fail:
+	DoResponseFail(c, err)
+
 }
 func SignOut(c *gin.Context) {
 
 	DoResponseOK(c, nil)
+	return
+
 }
 
 func SignUp(c *gin.Context) {
+
+	var req model.REQSignUp
+	var res *model.RESSignUp
+	var err error
+	if err = c.Bind(&req); err != nil {
+		goto fail
+	}
+
+	if res, err = service.SignUp(&req); err != nil {
+		goto fail
+	}
+	DoResponseOK(c, res)
+	return
+
+fail:
+	DoResponseFail(c, err)
 
 }

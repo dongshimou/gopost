@@ -1,49 +1,40 @@
 package model
 
 type REQNewArticle struct {
-	Title   string   `json:"title" binding:"required"`
+	Title    string   `json:"title" binding:"required"`
 	Tags     []string `json:"tags"`
-	Context string   `json:"context" binding:"required"`
-	CurrUser *REQCurrUser
+	Context  string   `json:"context" binding:"required"`
+	CurrUser *User    `json:"curr_user" form:"curr_user"`
 }
 type REQGetArticle struct {
-	Title string `json:"title" form:"title" url:"title"`
-	Aid   string `json:"aid" form:"aid"`
-	CurrUser *REQCurrUser
+	Title    string `form:"title" url:"title"`
+	Aid      string `form:"aid"`
+	CurrUser *User  `form:"curr_user"`
 }
 type REQNewReplay struct {
-	Aid     string `json:"aid" form:"aid"`
-	Title   string `json:"title" form:"title"`
-	Context string `json:"context" form:"context"`
-	CurrUser *REQCurrUser
+	Aid      string `json:"aid" form:"aid"`
+	Title    string `json:"title" form:"title"`
+	Context  string `json:"context" form:"context"`
+	CurrUser *User  `form:"curr_user"`
 }
 type REQGetReplays struct {
-	Title string `json:"title" form:"title" url:"title"`
-	Aid   string `json:"aid" form:"aid" `
-	CurrUser *REQCurrUser
+	Title    string `form:"title" url:"title"`
+	Aid      string `form:"aid" `
+	CurrUser *User  `form:"curr_user"`
 }
 type REQGetUserInfo struct {
-	Username string `json:"username" form:"username" url:"username"`
-	Uid      string `json:"uid" form:"uid"`
-	CurrUser *REQCurrUser
+	Username string `form:"username" url:"username"`
+	Uid      string `form:"uid"`
+	CurrUser *User  `form:"curr_user"`
 }
 
-type REQCurrUser struct {
-	CurrToken string
-	CurrUser string
-	CurrID uint
-	CurrPer int
-	CurrEmail string
-}
-
-type REQLogin struct {
+type REQSignin struct {
 	Username string `json:"username" form:"username"`
 	Password string `json:"password" form:"password"`
-	IP string `json:"ip" form:"ip"`
+	IP       string `json:"ip" form:"ip"`
 }
 
 type REQSignUp struct {
-	REQLogin
+	REQSignin
 	Email string `json:"email"`
 }
-

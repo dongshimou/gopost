@@ -19,7 +19,11 @@ func formatDatetime(time time.Time) string {
 	return utility.FormatDatetime(time)
 }
 
-func Login(req *model.REQLogin) (*model.RESLogin, error) {
+func SignIn(req *model.REQSignin) (*model.RESSignIn, error) {
+
+	return nil, nil
+}
+func SignUp(req *model.REQSignUp) (*model.RESSignUp, error) {
 
 	return nil, nil
 }

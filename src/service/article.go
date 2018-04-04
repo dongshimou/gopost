@@ -8,8 +8,9 @@ import (
 
 func PostNewArticle(req *model.REQNewArticle) error {
 
-	user := model.User{
-		Name: "root",
+	user := req.CurrUser
+	if user == nil {
+		return utility.NewError(utility.ERROR_AUTH_CODE, utility.ERROR_MSG_UNKNOW_USER)
 	}
 	db := controller.GetDB()
 
@@ -18,14 +19,6 @@ func PostNewArticle(req *model.REQNewArticle) error {
 		t := model.Tag{Name: req.Tags[i]}
 		db.FirstOrCreate(&t, &t)
 		tags = append(tags, &t)
-	}
-
-	if db.Where(&user).First(&user).Error != nil {
-		return db.Error
-	}
-	//验证权限
-	if err:=utility.VerifyPermission(user.Permission,model.Article_PermissionCreate);err!=nil{
-	return err
 	}
 
 	post := model.Article{
@@ -110,16 +103,11 @@ func NewReplay(req *model.REQNewReplay) (err error) {
 		}
 		article.ID = aid
 	}
-	user := model.User{
-		Name: "root",
-	}
+	user := req.CurrUser
 	article.Title = req.Title
 
 	db := controller.GetDB()
 	if err = db.Model(&article).Where(&article).Select("title").First(&article).Error; err != nil {
-		return err
-	}
-	if err = db.Model(&user).Where(&user).First(&user).Error; err != nil {
 		return err
 	}
 	replay := model.Replay{
@@ -168,34 +156,34 @@ func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
 	if isNullOrEmpty(req.Uid) && isNullOrEmpty(req.Username) {
 		return nil, utility.NewError(utility.ERROR_REQUEST_CODE, utility.ERROR_REQUEST_MSG)
 	}
-	user := model.User{}
+	quser := model.User{}
 
 	if !isNullOrEmpty(req.Uid) {
 		uid, err := parseID(req.Uid)
 		if err != nil {
 			return nil, err
 		}
-		user.ID = uid
+		quser.ID = uid
 	}
-	user.Name = req.Username
+	quser.Name = req.Username
 
 	db := controller.GetDB()
 
-	if err = db.Model(&user).Where(&user).First(&user).Error; err != nil {
+	if err = db.Model(&quser).Where(&quser).First(&quser).Error; err != nil {
 		return nil, err
 	}
 
-	if err = db.Model(&user).Select("title,created_at").Related(&user.Articles, "author_id").Error; err != nil {
+	if err = db.Model(&quser).Select("title,created_at").Related(&quser.Articles, "author_id").Error; err != nil {
 		return nil, err
 	}
-	if err = db.Model(&model.User{}).Related(&user.Replays, "author_name").Error; err != nil {
+	if err = db.Model(&model.User{}).Related(&quser.Replays, "author_name").Error; err != nil {
 		return nil, err
 	}
 
 	res := model.RESGetUserInfo{}
 
-	for i, _ := range user.Articles {
-		v := &user.Articles[i]
+	for i, _ := range quser.Articles {
+		v := &quser.Articles[i]
 
 		res.PostArticle = append(res.PostArticle, struct {
 			Title          string `json:"title"`
@@ -203,8 +191,8 @@ func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
 		}{Title: v.Title, CreateDatetime: formatDatetime(v.CreatedAt)})
 	}
 
-	for i, _ := range user.Replays {
-		v := &user.Replays[i]
+	for i, _ := range quser.Replays {
+		v := &quser.Replays[i]
 
 		res.PostReplay = append(res.PostReplay, struct {
 			Title          string `json:"title"`
@@ -213,11 +201,11 @@ func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
 		}{Title: v.ArticleTitle, Replay: v.Context, CreateDatetime: formatDatetime(v.CreatedAt)})
 	}
 
-	res.Username = user.Name
-	res.Uid = user.ID
-	res.Email = user.Email
-	res.Permission = user.Permission
-	res.CreateDatetime = formatDatetime(user.CreatedAt)
-	res.UpdateDatetime = formatDatetime(user.UpdatedAt)
+	res.Username = quser.Name
+	res.Uid = quser.ID
+	res.Email = quser.Email
+	res.Permission = quser.Permission
+	res.CreateDatetime = formatDatetime(quser.CreatedAt)
+	res.UpdateDatetime = formatDatetime(quser.UpdatedAt)
 	return &res, nil
 }
