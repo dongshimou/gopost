@@ -6,7 +6,7 @@ import (
 	"utility"
 )
 
-func PostNewArticle(req *model.REQNewArticle) error {
+func PostArticle(req *model.REQNewArticle) error {
 
 	user := req.CurrUser
 	if user == nil {
@@ -25,8 +25,7 @@ func PostNewArticle(req *model.REQNewArticle) error {
 		Title:    req.Title,
 		Context:  req.Context,
 		Tags:     tags,
-		AuthorID: user.ID,
-		EditorID: user.ID,
+		AuthorName:user.Name,
 	}
 
 	tx := db.Begin()
@@ -66,8 +65,6 @@ query:
 	//查询tags
 	db.Model(&article).Related(&article.Tags, "tags")
 	//db.Model(&article).Association("tags").Find(&article.Tags)
-	//查询user
-	db.Model(&article).Related(&article.Author, "author_id")
 
 	if db.Error != nil {
 		return nil, db.Error
@@ -75,7 +72,8 @@ query:
 	res := model.RESGetArticle{
 		Aid:    article.ID,
 		Title:  article.Title,
-		Author: article.Author.Name,
+		Author: article.AuthorName,
+		ReplayCount:article.ReplayCount,
 		Tags: func(tags []*model.Tag) []string {
 			ts := []string{}
 			for i, _ := range tags {
@@ -92,7 +90,6 @@ query:
 func DelArticle(req *model.REQDelArticle) (err error) {
 
 	article := model.Article{}
-
 	article.Title = req.Title
 	tx := controller.GetDB().Begin()
 
@@ -103,7 +100,7 @@ func DelArticle(req *model.REQDelArticle) (err error) {
 	tx.Commit()
 	return nil
 }
-func NewReplay(req *model.REQNewReplay) (err error) {
+func PostReplay(req *model.REQNewReplay) (err error) {
 	if isNullOrEmpty(req.Title) || isNullOrEmpty(req.Context) {
 		return utility.NewError(utility.ERROR_REQUEST_CODE, utility.ERROR_REQUEST_MSG)
 	}
@@ -120,15 +117,20 @@ func NewReplay(req *model.REQNewReplay) (err error) {
 	article.Title = req.Title
 
 	db := controller.GetDB()
-	if err = db.Model(&article).Where(&article).Select("title").First(&article).Error; err != nil {
+	if err = db.Model(&article).Where(&article).Select("id,title,replay_count").First(&article).Error; err != nil {
 		return err
 	}
 	replay := model.Replay{
 		ArticleTitle: article.Title,
 		AuthorName:   user.Name,
 		Context:      req.Context,
+		Count:article.ReplayCount+1,
 	}
 	tx := db.Begin()
+	if err=tx.Model(&article).Where(&article).Update(article).Error;err!=nil{
+		tx.Rollback()
+		return err
+	}
 	if err = tx.Save(&replay).Error; err != nil {
 		tx.Rollback()
 		return err
@@ -145,7 +147,11 @@ func GetArticleReplays(req *model.REQGetReplays) (*model.RESGetReplays, error) {
 	if err := db.Model(&article).Where(&article).Error; err != nil {
 		return nil, err
 	}
-	if err := db.Model(&article).Related(&article.Replays, "article_title").Error; err != nil {
+	if err := db.Model(&article).
+		Select("id,author_name,context,created_at").
+		Order("count desc").
+		Related(&article.Replays, "article_title").Error;
+		err != nil {
 		return nil, err
 	}
 	res := model.RESGetReplays{}
@@ -163,7 +169,17 @@ func GetArticleReplays(req *model.REQGetReplays) (*model.RESGetReplays, error) {
 	}
 	return &res, nil
 }
-
+func DelArticleReplay(req *model.REQDelReplays)(err error){
+	rid,err:=parseID(req.Rid)
+	if err!=nil{
+		return err
+	}
+	replay:=model.Replay{}
+	replay.ArticleTitle=req.Title
+	replay.ID=rid
+	//todo
+	return nil
+}
 func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
 	var err error
 	if isNullOrEmpty(req.Uid) && isNullOrEmpty(req.Username) {
@@ -186,10 +202,10 @@ func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
 		return nil, err
 	}
 
-	if err = db.Model(&quser).Select("title,created_at").Related(&quser.Articles, "author_id").Error; err != nil {
+	if err = db.Model(&quser).Select("title,created_at").Order("created_at asc").Related(&quser.Articles, "author_id").Error; err != nil {
 		return nil, err
 	}
-	if err = db.Model(&model.User{}).Related(&quser.Replays, "author_name").Error; err != nil {
+	if err = db.Model(&model.User{}).Select("article_title,context,created_at").Order("created_at asc").Related(&quser.Replays, "author_name").Error; err != nil {
 		return nil, err
 	}
 

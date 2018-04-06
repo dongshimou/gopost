@@ -99,6 +99,13 @@ var routes = []Route{
 		MakeAuth(model.Replay_Read),
 	},
 	Route{
+		"DelReplay",
+		"DELETE",
+		"/v1/replay/:title/:rid",
+		handler.DelReplays,
+		MakeAuth(model.Replay_Delete),
+	},
+	Route{
 		"GetUserInfo",
 		"GET",
 		"/v1/user/:username",

@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	DB_id="id"
 	DB_created_at = "created_at"
 	DB_updated_at = "updated_at"
 	DB_deleted_at = "deleted_at"
@@ -13,18 +14,21 @@ const (
 type Article struct {
 	gorm.Model
 	Title    string `gorm:"size:255;not null;unique;"`
-	Author   User   `gorm:"FOREIGNKEY:AuthorID;"`
-	AuthorID uint
-
-	Editor   User `gorm:"FOREIGNKEY:EditorID;"`
-	EditorID uint
-
+	Author   User   `gorm:"FOREIGNKEY:AuthorName;"`
+	AuthorName string  `gorm:"size:255;not null;index;"`
+	ReplayCount	uint `gorm:"default:0"`
 	Tags              []*Tag   `gorm:"many2many:tag_articles;"`
 	Context           string   `gorm:"size:65535;"`
 	Replays           []Replay `gorm:"FOREIGNKEY:ArticleTitle;"`
 	PermissionRequire int      `gorm:"default:1;"`
 }
-
+const(
+	DB_article_title="article_title"
+	DB_article_author_name="author_name"
+	DB_article_replay_count="replay_count"
+	DB_article_context="context"
+	DB_article_permission_require="permission_require"
+)
 type Replay struct {
 	gorm.Model
 	Article      Article `gorm:"FOREIGNKEY:ArticleTitle;"`
@@ -33,6 +37,7 @@ type Replay struct {
 	Author     User   `gorm:"FOREIGNKEY:AuthorName;"`
 	AuthorName string `gorm:"size:255;not null;index;"` //id
 	Context    string `gorm:"size:2048;"`
+	Count	uint `gorm:"not null;index;"`
 }
 type Tag struct {
 	gorm.Model
