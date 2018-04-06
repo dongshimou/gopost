@@ -22,7 +22,7 @@ type RESGetArticle struct {
 	Author         string   `json:"author"`
 	Tags           []string `json:"tags"`
 	Context        string   `json:"context"`
-	ReplayCount    uint `json:"replay_count"`
+	ReplayCount    uint     `json:"replay_count"`
 	CreateDatetime string   `json:"create_datetime"`
 	EditDatetime   string   `json:"edit_datetime"`
 }

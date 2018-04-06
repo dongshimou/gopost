@@ -27,8 +27,9 @@ type REQGetReplays struct {
 	CurrUser *User  `form:"curr_user"`
 }
 type REQDelReplays struct {
-	Title string
-	Rid string
+	Title    string
+	Count    string
+	Rid      string
 	CurrUser *User `form:"curr_user"`
 }
 type REQGetUserInfo struct {

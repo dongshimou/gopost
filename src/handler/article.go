@@ -44,25 +44,25 @@ func GetReplays(c *gin.Context) {
 fail:
 	DoResponseFail(c, err)
 }
-func DelReplays(c *gin.Context){
+func DelReplays(c *gin.Context) {
 	var req model.REQDelReplays
 	var err error
 
-	req.Title=c.Param("title")
-	req.Rid=c.Param("rid")
-	if req.CurrUser,err=getCurrUser(c);err!=nil{
+	req.Title = c.Param("title")
+	req.Count = c.Param("count")
+	if req.CurrUser, err = getCurrUser(c); err != nil {
 		goto fail
 	}
-	if err=c.Bind(&req);err!=nil{
+	if err = c.Bind(&req); err != nil {
 		goto fail
 	}
-	if err=service.DelArticleReplay(&req);err!=nil{
+	if err = service.DelArticleReplay(&req); err != nil {
 		goto fail
 	}
-	DoResponseOK(c,nil)
+	DoResponseOK(c, nil)
 	return
-	fail:
-		DoResponseFail(c,err)
+fail:
+	DoResponseFail(c, err)
 }
 func GetUserInfo(c *gin.Context) {
 	var req model.REQGetUserInfo

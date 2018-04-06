@@ -101,7 +101,7 @@ var routes = []Route{
 	Route{
 		"DelReplay",
 		"DELETE",
-		"/v1/replay/:title/:rid",
+		"/v1/replay/:title/:count",
 		handler.DelReplays,
 		MakeAuth(model.Replay_Delete),
 	},
