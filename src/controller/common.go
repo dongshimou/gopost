@@ -8,6 +8,7 @@ import (
 	"log"
 	"logger"
 	"model"
+	"time"
 )
 
 var (
@@ -28,6 +29,12 @@ func InitDB() error {
 		log.Print(err)
 		return err
 	}
+
+	//连接池配置
+	db.DB().SetMaxOpenConns(10)
+	db.DB().SetMaxIdleConns(100)
+	db.DB().SetConnMaxLifetime(time.Hour)
+	//使用默认表名
 	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
 		return defaultTableName
 	}
