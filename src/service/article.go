@@ -117,7 +117,10 @@ func PostReplay(req *model.REQNewReplay) (err error) {
 	article.Title = req.Title
 
 	db := controller.GetDB()
-	if err = db.Model(&article).Where(&article).Select("id,title,replay_count").First(&article).Error; err != nil {
+	if err = db.Model(&article).
+	Where(&article).
+	Select(buildArgs(",",model.DB_id,model.Table_Article_Title,model.Table_Article_ReplayCount)).
+	First(&article).Error; err != nil {
 		return err
 	}
 	replay := model.Replay{

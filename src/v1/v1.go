@@ -142,4 +142,13 @@ var routes = []Route{
 		handler.SignVerify,
 		nil,
 	},
+
+	//rss
+	Route{
+		"RSS",
+		"GET",
+		"/v1/rss",
+		handler.Rss,
+		nil,
+	},
 }
