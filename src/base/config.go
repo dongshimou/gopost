@@ -19,7 +19,12 @@ type Database struct {
 	Database string `json:"database"`
 }
 type Server struct {
+	Title string `json:"title"`
+	Link string `json:"link"`
+	Description string `json:"description"`
 	Name string `json:"name"`
+	Email string `json:"email"`
+
 	Port string `json:"port"`
 }
 type Token struct {

@@ -1,7 +1,5 @@
 package model
 
-import "encoding/xml"
-
 type Response struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
@@ -58,29 +56,3 @@ type RESGetUserInfo struct {
 	} `json:"post_replay"`
 }
 
-type RssFeed struct {
-	//有且仅有一个 channel
-	XMLName xml.Name `xml:"rss"`
-	Version string `xml:"version,attr"`
-	Channel *RssChanel `xml:"channel"`
-}
-type RssChanel struct {
-	XMLName xml.Name `xml:"channel"`
-	Title       string    `xml:"title"`
-	Link        string    `xml:"link"`
-	Description string    `xml:"description"`
-	Language    string    `xml:"language,omitempty"`
-	Copyright   string    `xml:"copyright,omitempty"`
-	PubDate     string    `xml:"pubDate,omitempty"`
-	ManagingEditor string `xml:"managingEditor,omitempty"`
-	LastBuildDate string `xml:"lastBuildDate,omitempty"`
-	Item        []RssItem `xml:"item"`
-}
-type RssItem struct {
-	XMLName xml.Name `xml:"item"`
-	Title       string `xml:"title"`
-	Link        string `xml:"link"`
-	Author      string `xml:"author"`
-	PubDate     string `xml:"pubDate"`
-	Description string `xml:"description"`
-}
