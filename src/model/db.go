@@ -26,7 +26,7 @@ type Article struct {
 }
 
 const (
-	Table_Article_Title             = "article_title"
+	Table_Article_Title             = "title"
 	Table_Article_AuthorName        = "author_name"
 	Table_Article_ReplayCount       = "replay_count"
 	Table_Article_Context           = "context"

@@ -3,7 +3,6 @@ package handler
 import (
 	"base"
 	"github.com/gin-gonic/gin"
-	"log"
 	"logger"
 	"model"
 	"net/http"
@@ -56,16 +55,18 @@ func AuthDecorator(getToken func(string) (*model.User, error), prems ...int) gin
 	return func(c *gin.Context) {
 		var token string
 		c.Request.ParseForm()
-		if token = c.Request.Header.Get("X-User-Token"); len(token) > 0 {
-		} else if token = c.Request.Header.Get("USER-TOKEN"); len(token) > 0 {
-		} else if token = c.PostForm("user_token"); len(token) > 0 {
-		} else if token = c.Query("user_token"); len(token) > 0 {
-		} else if token, _ = c.Cookie("user_auth_token"); len(token) > 0 {
-		} else {
-			log.Println(utility.ERROR_MSG_AUTH_TOKEN_NOT_EXIST)
-			DoResponseFail(c, utility.NewError(utility.ERROR_AUTH_CODE, utility.ERROR_MSG_AUTH_TOKEN_NOT_EXIST))
-			c.Abort()
-			return
+		if !logger.DEBUG{
+			if token = c.Request.Header.Get("X-User-Token"); len(token) > 0 {
+			} else if token = c.Request.Header.Get("USER-TOKEN"); len(token) > 0 {
+			} else if token = c.PostForm("user_token"); len(token) > 0 {
+			} else if token = c.Query("user_token"); len(token) > 0 {
+			} else if token, _ = c.Cookie("user_auth_token"); len(token) > 0 {
+			} else {
+				logger.Print(utility.ERROR_MSG_AUTH_TOKEN_NOT_EXIST)
+				DoResponseFail(c, utility.NewError(utility.ERROR_AUTH_CODE, utility.ERROR_MSG_AUTH_TOKEN_NOT_EXIST))
+				c.Abort()
+				return
+			}
 		}
 		logger.Print("user token : ", token)
 		user, err := getToken(token)

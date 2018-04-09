@@ -22,7 +22,7 @@ func MakeHandler(args ...gin.HandlerFunc) gin.HandlersChain {
 }
 func StartService() {
 	router := gin.Default()
-
+	//jsonp 中间件
 	router.Use(JsonP())
 
 	for _, route := range routes {
