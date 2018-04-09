@@ -6,10 +6,10 @@ import (
 	"service"
 )
 
-func Rss(c *gin.Context){
-	xml,err:=service.Rss()
-	if err!=nil{
-		c.XML(http.StatusInternalServerError,err.Error())
+func Rss(c *gin.Context) {
+	xml, err := service.Rss()
+	if err != nil {
+		c.XML(http.StatusInternalServerError, err.Error())
 	}
-	c.XML(http.StatusOK,xml)
+	c.XML(http.StatusOK, xml)
 }

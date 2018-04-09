@@ -9,8 +9,8 @@ const (
 	DB_created_at = "created_at"
 	DB_updated_at = "updated_at"
 	DB_deleted_at = "deleted_at"
-	DB_asc		="asc"
-	DB_desc		="desc"
+	DB_asc        = "asc"
+	DB_desc       = "desc"
 )
 
 type Article struct {
@@ -43,12 +43,14 @@ type Replay struct {
 	Context    string `gorm:"size:2048;"`
 	Count      uint   `gorm:"not null;index;"`
 }
-const(
-	Table_Replay_ArticleTitle ="article_title"
-	Table_Replay_AuthorName   ="author_name"
-	Table_Replay_Context      ="context"
-	Table_Replay_Count        ="count"
+
+const (
+	Table_Replay_ArticleTitle = "article_title"
+	Table_Replay_AuthorName   = "author_name"
+	Table_Replay_Context      = "context"
+	Table_Replay_Count        = "count"
 )
+
 type Tag struct {
 	gorm.Model
 	Name     string     `gorm:"size:255;unique;"`

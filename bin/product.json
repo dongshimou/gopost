@@ -8,7 +8,7 @@
   },
   "server":{
     "title":"a small blog",
-    "link":"http://127.0.0.1",
+    "link":"http://127.0.0.1/",
     "description":"my blog",
     "name":"skadi",
     "email":"xx@xx.com",

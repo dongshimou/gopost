@@ -55,4 +55,3 @@ type RESGetUserInfo struct {
 		CreateDatetime string `json:"create_datetime"`
 	} `json:"post_replay"`
 }
-

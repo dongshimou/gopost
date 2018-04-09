@@ -10,15 +10,19 @@ import (
 	"utility"
 )
 
+const (
+	pathVer = "/v1"
+)
+
 func InitV1() error {
 	err := controller.InitDB()
 	if err != nil {
 		return err
 	}
-
+	scfg := GetConfig().Server
 	if logger.DEBUG {
 		controller.GetDB().Create(&model.User{
-			Name:     "root",
+			Name:     scfg.Name,
 			Password: "123456",
 			Permission: utility.CreatePermission(
 				model.Article_Read,
@@ -49,7 +53,7 @@ func GetUserFromToken(token string) (*model.User, error) {
 	user := &model.User{}
 	var err error
 	if logger.DEBUG {
-		user.Name = "root"
+		user.Name = GetConfig().Server.Name
 	} else {
 		if user.Name, err = utility.ParseToken(token); err != nil {
 			return nil, err
@@ -66,49 +70,49 @@ var routes = []Route{
 	Route{
 		"PostArticle",
 		"POST",
-		"/v1/article",
+		pathVer + "/article",
 		handler.PostArticle,
 		MakeAuth(model.Article_Create),
 	},
 	Route{
 		"GetArticle",
 		"GET",
-		"/v1/article/:title",
+		pathVer + "/article/:title",
 		handler.GetArticle,
 		MakeAuth(model.Article_Read),
 	},
 	Route{
 		"DelArticle",
 		"DELETE",
-		"/v1/article/:title",
+		pathVer + "/article/:title",
 		handler.DelArticle,
 		MakeAuth(model.Article_Delete),
 	},
 	Route{
 		"PostReplay",
 		"POST",
-		"/v1/replay",
+		pathVer + "/replay",
 		handler.PostReplay,
 		MakeAuth(model.Replay_Create),
 	},
 	Route{
 		"GetReplay",
 		"GET",
-		"/v1/replay/:title",
+		pathVer + "/replay/:title",
 		handler.GetReplays,
 		MakeAuth(model.Replay_Read),
 	},
 	Route{
 		"DelReplay",
 		"DELETE",
-		"/v1/replay/:title/:count",
+		pathVer + "/replay/:title/:count",
 		handler.DelReplays,
 		MakeAuth(model.Replay_Delete),
 	},
 	Route{
 		"GetUserInfo",
 		"GET",
-		"/v1/user/:username",
+		pathVer + "/user/:username",
 		handler.GetUserInfo,
 		MakeAuth(model.User_Read),
 	},
@@ -117,28 +121,28 @@ var routes = []Route{
 	Route{
 		"SignIn",
 		"POST",
-		"/v1/sign/in",
+		pathVer + "/sign/in",
 		handler.SignIn,
 		nil,
 	},
 	Route{
 		"SignOut",
 		"GET",
-		"/v1/sign/out",
+		pathVer + "/sign/out",
 		handler.SignOut,
 		nil,
 	},
 	Route{
 		"SignUp",
 		"POST",
-		"/v1/sign/up",
+		pathVer + "/sign/up",
 		handler.SignUp,
 		nil,
 	},
 	Route{
 		"SignVerify",
 		"GET",
-		"/v1/sign/verify",
+		pathVer + "/sign/verify",
 		handler.SignVerify,
 		nil,
 	},
@@ -147,7 +151,7 @@ var routes = []Route{
 	Route{
 		"RSS",
 		"GET",
-		"/v1/rss",
+		pathVer + "/rss",
 		handler.Rss,
 		nil,
 	},

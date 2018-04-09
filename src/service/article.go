@@ -118,9 +118,9 @@ func PostReplay(req *model.REQNewReplay) (err error) {
 
 	db := controller.GetDB()
 	if err = db.Model(&article).
-	Where(&article).
-	Select(buildArgs(",",model.DB_id,model.Table_Article_Title,model.Table_Article_ReplayCount)).
-	First(&article).Error; err != nil {
+		Where(&article).
+		Select(buildArgs(",", model.DB_id, model.Table_Article_Title, model.Table_Article_ReplayCount)).
+		First(&article).Error; err != nil {
 		return err
 	}
 	replay := model.Replay{
@@ -151,8 +151,8 @@ func GetArticleReplays(req *model.REQGetReplays) (*model.RESGetReplays, error) {
 		return nil, err
 	}
 	if err := db.Model(&article).
-		Select(buildArgs(",",model.DB_id,model.Table_Article_AuthorName,model.Table_Article_Context,model.DB_created_at)).
-		Order(buildArgs(" ",model.Table_Replay_Count,model.DB_desc)).
+		Select(buildArgs(",", model.DB_id, model.Table_Article_AuthorName, model.Table_Article_Context, model.DB_created_at)).
+		Order(buildArgs(" ", model.Table_Replay_Count, model.DB_desc)).
 		Related(&article.Replays, "article_title").Error; err != nil {
 		return nil, err
 	}
@@ -219,17 +219,15 @@ func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
 	}
 
 	if err = db.Model(&quser).
-		Select(buildArgs(",",model.Table_Article_Title,model.DB_created_at)).
-		Order(buildArgs(" ",model.DB_created_at,model.DB_asc)).
-		Related(&quser.Articles, "author_id").Error;
-		err != nil {
+		Select(buildArgs(",", model.Table_Article_Title, model.DB_created_at)).
+		Order(buildArgs(" ", model.DB_created_at, model.DB_asc)).
+		Related(&quser.Articles, "author_id").Error; err != nil {
 		return nil, err
 	}
 	if err = db.Model(&model.User{}).
-		Select(buildArgs(",",model.Table_Replay_ArticleTitle,model.Table_Replay_Context,model.DB_created_at)).
-		Order(buildArgs(" ",model.DB_created_at,model.DB_asc)).
-		Related(&quser.Replays, "author_name").Error;
-		err != nil {
+		Select(buildArgs(",", model.Table_Replay_ArticleTitle, model.Table_Replay_Context, model.DB_created_at)).
+		Order(buildArgs(" ", model.DB_created_at, model.DB_asc)).
+		Related(&quser.Replays, "author_name").Error; err != nil {
 		return nil, err
 	}
 

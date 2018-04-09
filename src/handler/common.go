@@ -55,7 +55,7 @@ func AuthDecorator(getToken func(string) (*model.User, error), prems ...int) gin
 	return func(c *gin.Context) {
 		var token string
 		c.Request.ParseForm()
-		if !logger.DEBUG{
+		if !logger.DEBUG {
 			if token = c.Request.Header.Get("X-User-Token"); len(token) > 0 {
 			} else if token = c.Request.Header.Get("USER-TOKEN"); len(token) > 0 {
 			} else if token = c.PostForm("user_token"); len(token) > 0 {

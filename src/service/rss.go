@@ -1,50 +1,46 @@
 package service
 
 import (
+	"base"
+	"controller"
+	"github.com/gorilla/feeds"
 	"model"
 	"time"
-	"controller"
-	"base"
-	"github.com/gorilla/feeds"
 )
 
 //github.com/gorilla/feeds
-func Rss()(xml interface{},err error){
-	scfg:=base.GetConfig().Server
+func Rss() (xml interface{}, err error) {
+	scfg := base.GetConfig().Server
 
-	proto:="http://"
-	host:="127.0.0.1"
-	port:=scfg.Port
-	address:=proto+host+":"+port
-	apath:="/v1/article/"
+	apath := "/v1/article/"
 
-	now:=time.Now()
-	feed:=&feeds.Feed{
-	Title:scfg.Name,
-	Link:&feeds.Link{Href:scfg.Link},
-	Description:scfg.Description,
-	Author:&feeds.Author{Name:scfg.Name,Email:scfg.Email},
-	Created:now,
+	now := time.Now()
+	feed := &feeds.Feed{
+		Title:       scfg.Name,
+		Link:        &feeds.Link{Href: scfg.Link},
+		Description: scfg.Description,
+		Author:      &feeds.Author{Name: scfg.Name, Email: scfg.Email},
+		Created:     now,
 	}
 
-	db:=controller.GetDB()
+	db := controller.GetDB()
 
-	articles:=[]model.Article{}
+	articles := []model.Article{}
 
 	//查找最后十个
 	db.Model(&model.Article{}).
-	Select(buildArgs(",",model.Table_Article_Title,model.DB_created_at,model.Table_Article_AuthorName)).
-	Limit(10).
-	Find(&articles)
+		Select(buildArgs(",", model.Table_Article_Title, model.DB_created_at, model.Table_Article_AuthorName)).
+		Limit(10).
+		Find(&articles)
 
-	for i,_:=range articles{
-		v:=&articles[i]
+	for i, _ := range articles {
+		v := &articles[i]
 		feed.Add(&feeds.Item{
-			Title:v.Title,
-			Link:&feeds.Link{Href:address+apath+v.Title},
-			Description:v.Title,
-			Author:&feeds.Author{Name:v.AuthorName},
-			Created:v.CreatedAt,
+			Title:       v.Title,
+			Link:        &feeds.Link{Href: scfg.Link + apath + v.Title},
+			Description: v.Title,
+			Author:      &feeds.Author{Name: v.AuthorName},
+			Created:     v.CreatedAt,
 		})
 	}
 
@@ -54,6 +50,6 @@ func Rss()(xml interface{},err error){
 	//}
 	//<?xml version="1.0" encoding="UTF-8"?> len=38
 
-	rss:=feeds.Rss{feed}
-	return rss.FeedXml(),err
+	rss := feeds.Rss{feed}
+	return rss.FeedXml(), err
 }
