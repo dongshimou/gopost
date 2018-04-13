@@ -95,7 +95,9 @@ func setHeaderToken(c *gin.Context, token string) {
 	//Expires:exp,
 	//}
 	//http.SetCookie(c.Writer,&cookie)
-	c.SetCookie("USER-TOKEN", token, int(base.GetConfig().Token.TTL), "", "", false, false)
+	c.SetCookie("USER-TOKEN", token,
+	int(base.GetConfig().Token.TTL),
+	"", "", false, true)
 }
 func getCurrUser(c *gin.Context) (*model.User, error) {
 	if a, ok1 := c.Get("curr_user"); ok1 {

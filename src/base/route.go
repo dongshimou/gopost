@@ -24,6 +24,8 @@ func StartService() {
 	router := gin.Default()
 	//jsonp 中间件
 	router.Use(JsonP())
+	//option 中间件
+	router.Use(Cors())
 
 	for _, route := range routes {
 		pattern := route.Pattern
