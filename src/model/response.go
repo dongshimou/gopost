@@ -25,6 +25,9 @@ type RESGetArticle struct {
 	ReplayCount    uint     `json:"replay_count"`
 	CreateDatetime string   `json:"create_datetime"`
 	EditDatetime   string   `json:"edit_datetime"`
+
+	Next string `json:"next"`
+	Prev string `json:"prev"`
 }
 
 type RESGetReplays struct {

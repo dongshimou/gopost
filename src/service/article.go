@@ -61,14 +61,26 @@ func GetArticle(req *model.REQGetArticle) (*model.RESGetArticle, error) {
 query:
 	db := controller.GetDB()
 	//查询post
-	db.Where(&article).First(&article)
-	//查询tags
-	db.Model(&article).Related(&article.Tags, "tags")
-	//db.Model(&article).Association("tags").Find(&article.Tags)
-
-	if db.Error != nil {
-		return nil, db.Error
+	if err:=db.Where(&article).First(&article).Error;err!=nil{
+		return nil,err
 	}
+	//查询tags
+	if err:=db.Model(&article).Related(&article.Tags, "tags").Error;err!=nil{
+		//db.Model(&article).Association("tags").Find(&article.Tags)
+		return nil,err
+	}
+	next:=model.Article{}
+	next.ID=article.ID+1
+	prev:=model.Article{}
+	prev.ID=article.ID-1
+	//上一篇和下一篇
+	if prev.ID>0{
+		db.Model(&prev).Where(&prev).Select("title").First(&prev)
+	}
+	if next.ID>0{
+		db.Model(&next).Where(&next).Select("title").Last(&next)
+	}
+
 	res := model.RESGetArticle{
 		Aid:         article.ID,
 		Title:       article.Title,
@@ -84,6 +96,8 @@ query:
 		Context:        article.Context,
 		CreateDatetime: formatDatetime(article.CreatedAt),
 		EditDatetime:   formatDatetime(article.UpdatedAt),
+		Next:next.Title,
+		Prev:prev.Title,
 	}
 	return &res, nil
 }
