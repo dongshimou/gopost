@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"model"
 	"service"
+	"sync"
 )
 
 func PostReplay(c *gin.Context) {
@@ -25,24 +26,30 @@ fail:
 	DoResponseFail(c, err)
 }
 func GetReplays(c *gin.Context) {
-	var req model.REQGetReplays
-	var res *model.RESGetReplays
-	var err error
-	req.Title = c.Param("title")
-	if req.CurrUser, err = getCurrUser(c); err != nil {
-		goto fail
-	}
-	if err = c.Bind(&req); err != nil {
-		goto fail
-	}
-	if res, err = service.GetArticleReplays(&req); err != nil {
-		goto fail
-	}
-	DoResponseOK(c, res)
-	return
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var req model.REQGetReplays
+		var res *model.RESGetReplays
+		var err error
+		req.Title = c.Param("title")
+		if req.CurrUser, err = getCurrUser(c); err != nil {
+			goto fail
+		}
+		if err = c.Bind(&req); err != nil {
+			goto fail
+		}
+		if res, err = service.GetArticleReplays(&req); err != nil {
+			goto fail
+		}
+		DoResponseOK(c, res)
+		return
 
-fail:
-	DoResponseFail(c, err)
+	fail:
+		DoResponseFail(c, err)
+	}()
+	wg.Wait()
 }
 func DelReplays(c *gin.Context) {
 	var req model.REQDelReplays
@@ -65,46 +72,57 @@ fail:
 	DoResponseFail(c, err)
 }
 func GetUserInfo(c *gin.Context) {
-	var req model.REQGetUserInfo
-	var res *model.RESGetUserInfo
-	var err error
-	req.Username = c.Param("username")
-	if req.CurrUser, err = getCurrUser(c); err != nil {
-		goto fail
-	}
-	if err = c.Bind(&req); err != nil {
-		goto fail
-	}
-	if res, err = service.GetUserInfo(&req); err != nil {
-		goto fail
-	}
-	DoResponseOK(c, res)
-	return
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var req model.REQGetUserInfo
+		var res *model.RESGetUserInfo
+		var err error
+		req.Username = c.Param("username")
+		if req.CurrUser, err = getCurrUser(c); err != nil {
+			goto fail
+		}
+		if err = c.Bind(&req); err != nil {
+			goto fail
+		}
+		if res, err = service.GetUserInfo(&req); err != nil {
+			goto fail
+		}
+		DoResponseOK(c, res)
+		return
 
-fail:
-	DoResponseFail(c, err)
+	fail:
+		DoResponseFail(c, err)
+	}()
 
+	wg.Wait()
 }
 func GetArticle(c *gin.Context) {
-	var req model.REQGetArticle
-	var res *model.RESGetArticle
-	var err error
-	req.Title = c.Param("title")
-	// 等待 gin 的bind url 功能
-	if req.CurrUser, err = getCurrUser(c); err != nil {
-		goto fail
-	}
-	if err = c.Bind(&req); err != nil {
-		goto fail
-	}
-	if res, err = service.GetArticle(&req); err != nil {
-		goto fail
-	}
-	DoResponseOK(c, res)
-	return
-
-fail:
-	DoResponseFail(c, err)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		var req model.REQGetArticle
+		var res *model.RESGetArticle
+		var err error
+		req.Title = c.Param("title")
+		// 等待 gin 的bind url 功能
+		if req.CurrUser, err = getCurrUser(c); err != nil {
+			goto fail
+		}
+		if err = c.Bind(&req); err != nil {
+			goto fail
+		}
+		if res, err = service.GetArticle(&req); err != nil {
+			goto fail
+		}
+		DoResponseOK(c, res)
+		return
+	fail:
+		DoResponseFail(c, err)
+	}()
+	wg.Wait()
 }
 func PostArticle(c *gin.Context) {
 	var req model.REQNewArticle

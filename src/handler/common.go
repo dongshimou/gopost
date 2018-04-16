@@ -22,7 +22,6 @@ func doFail(c *gin.Context, code int, msg string) {
 	}
 }
 func DoResponseFail(c *gin.Context, err error) {
-
 	switch v := err.(type) {
 	case *utility.InnerError:
 		doFail(c, v.Code, v.Msg)
@@ -31,9 +30,7 @@ func DoResponseFail(c *gin.Context, err error) {
 	}
 }
 func DoResponseOK(c *gin.Context, data interface{}) {
-
 	var res interface{}
-
 	//组装JSON返回数据
 	if data != nil {
 		res = model.Response{
@@ -96,8 +93,8 @@ func setHeaderToken(c *gin.Context, token string) {
 	//}
 	//http.SetCookie(c.Writer,&cookie)
 	c.SetCookie("USER-TOKEN", token,
-	int(base.GetConfig().Token.TTL),
-	"", "", false, true)
+		int(base.GetConfig().Token.TTL),
+		"", "", false, true)
 }
 func getCurrUser(c *gin.Context) (*model.User, error) {
 	if a, ok1 := c.Get("curr_user"); ok1 {

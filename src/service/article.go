@@ -4,6 +4,7 @@ import (
 	"controller"
 	"model"
 	"utility"
+	"logger"
 )
 
 func PostArticle(req *model.REQNewArticle) error {
@@ -61,26 +62,19 @@ func GetArticle(req *model.REQGetArticle) (*model.RESGetArticle, error) {
 query:
 	db := controller.GetDB()
 	//查询post
-	if err:=db.Where(&article).First(&article).Error;err!=nil{
-		return nil,err
+	if err := db.Where(&article).First(&article).Error; err != nil {
+		return nil, err
 	}
 	//查询tags
-	if err:=db.Model(&article).Related(&article.Tags, "tags").Error;err!=nil{
+	if err := db.Model(&article).Related(&article.Tags, "tags").Error; err != nil {
 		//db.Model(&article).Association("tags").Find(&article.Tags)
-		return nil,err
+		return nil, err
 	}
-	next:=model.Article{}
-	next.ID=article.ID+1
-	prev:=model.Article{}
-	prev.ID=article.ID-1
+	next := model.Article{}
+	prev := model.Article{}
 	//上一篇和下一篇
-	if prev.ID>0{
-		db.Model(&prev).Where(&prev).Select("title").First(&prev)
-	}
-	if next.ID>0{
-		db.Model(&next).Where(&next).Select("title").Last(&next)
-	}
-
+	db.Model(&prev).Where("id < ?",article.ID).Select("title").Last(&prev)
+	db.Model(&next).Where("id > ?",article.ID).Select("title").First(&next)
 	res := model.RESGetArticle{
 		Aid:         article.ID,
 		Title:       article.Title,
@@ -96,8 +90,8 @@ query:
 		Context:        article.Context,
 		CreateDatetime: formatDatetime(article.CreatedAt),
 		EditDatetime:   formatDatetime(article.UpdatedAt),
-		Next:next.Title,
-		Prev:prev.Title,
+		Next:           next.Title,
+		Prev:           prev.Title,
 	}
 	return &res, nil
 }
@@ -106,7 +100,6 @@ func DelArticle(req *model.REQDelArticle) (err error) {
 	article := model.Article{}
 	article.Title = req.Title
 	tx := controller.GetDB().Begin()
-
 	if err = tx.Model(&article).Where(&article).Delete(&article).Error; err != nil {
 		tx.Rollback()
 		return err
@@ -131,6 +124,7 @@ func PostReplay(req *model.REQNewReplay) (err error) {
 	article.Title = req.Title
 
 	db := controller.GetDB()
+	logger.Print(buildArgs(",", model.DB_id, model.Table_Article_Title, model.Table_Article_ReplayCount))
 	if err = db.Model(&article).
 		Where(&article).
 		Select(buildArgs(",", model.DB_id, model.Table_Article_Title, model.Table_Article_ReplayCount)).
@@ -144,14 +138,18 @@ func PostReplay(req *model.REQNewReplay) (err error) {
 		Count:        article.ReplayCount + 1,
 	}
 	tx := db.Begin()
-	if err = tx.Model(&article).Where(&article).Update(article).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
 	if err = tx.Save(&replay).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
+	article.ReplayCount+=1
+	where:=model.Article{}
+	where.ID=article.ID
+	if err = tx.Model(&article).Where(&where).Update(article).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
 	tx.Commit()
 	return nil
 }

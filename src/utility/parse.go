@@ -79,6 +79,6 @@ func safe_s2i64(s string) int64 {
 	return id
 }
 func parseTime(datetime string) time.Time {
-	t, _ := time.Parse("2006-01-02 15:04:05", datetime)
+	t, _ := time.ParseInLocation("2006-01-02 15:04:05", datetime,time.Local)
 	return t
 }

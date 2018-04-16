@@ -1,8 +1,8 @@
 package base
 
 import (
-	"github.com/gin-gonic/gin"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"log"
 )
 
@@ -13,7 +13,7 @@ func Cors() gin.HandlerFunc {
 		return true
 	}
 	config.AllowCredentials = true
-	config.AllowOrigins = []string{"*",}
+	config.AllowOrigins = []string{"*"}
 
 	return cors.New(config)
 }
