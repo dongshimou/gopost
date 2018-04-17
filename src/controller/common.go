@@ -40,17 +40,9 @@ func InitDB() error {
 	}
 	db = db.Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8 auto_increment=1")
 
-	if db.HasTable(&model.Article{}) == false {
-		db = db.CreateTable(&model.Article{})
-	}
-	if db.HasTable(&model.Replay{}) == false {
-		db = db.CreateTable(&model.Replay{})
-	}
-	if db.HasTable(&model.User{}) == false {
-		db = db.CreateTable(&model.User{})
-	}
-	if db.HasTable(&model.Tag{}) == false {
-		db = db.CreateTable(&model.Tag{})
+	db=db.AutoMigrate(&model.Article{},&model.Replay{},&model.User{},&model.Tag{})
+	if logger.DEBUG{
+		db.LogMode(true)
 	}
 	return db.Error
 }

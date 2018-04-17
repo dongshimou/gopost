@@ -16,12 +16,12 @@ const (
 type Article struct {
 	gorm.Model
 	Title             string   `gorm:"size:255;not null;unique;"`
-	Author            User     `gorm:"FOREIGNKEY:AuthorName;"`
+	Replays           []Replay `gorm:"foreignkey:ArticleTitle;association_foreignkey:Title;"`
 	AuthorName        string   `gorm:"size:255;not null;index;"`
+	Author            User     `gorm:"foreignkey:AuthorName"`
+	Context           string   `gorm:"size:65535;"`
 	ReplayCount       uint     `gorm:"default:0"`
 	Tags              []*Tag   `gorm:"many2many:tag_articles;"`
-	Context           string   `gorm:"size:65535;"`
-	Replays           []Replay `gorm:"FOREIGNKEY:ArticleTitle;"`
 	PermissionRequire int      `gorm:"default:1;"`
 }
 
@@ -35,13 +35,12 @@ const (
 
 type Replay struct {
 	gorm.Model
-	Article      Article `gorm:"FOREIGNKEY:ArticleTitle;"`
+	Article      Article `gorm:"foreignkey:ArticleTitle;"`
 	ArticleTitle string  `gorm:"size:255;not null;index;"` //id
-
-	Author     User   `gorm:"FOREIGNKEY:AuthorName;"`
-	AuthorName string `gorm:"size:255;not null;index;"` //id
-	Context    string `gorm:"size:2048;"`
-	Count      uint   `gorm:"not null;index;"`
+	Author       User    `gorm:"foreignkey:AuthorName;"`
+	AuthorName   string  `gorm:"size:255;not null;index;"` //id
+	Context      string  `gorm:"size:2048;"`
+	Count        uint    `gorm:"not null;index;"`
 }
 
 const (
@@ -63,11 +62,10 @@ type User struct {
 	Email      string    `gorm:"size:255;unique;"`
 	Password   string    `gorm:"size:128;"`
 	Permission int       `gorm:"default:1;"`
-	Articles   []Article `gorm:"FOREIGNKEY:AuthorID;"`
-	Replays    []Replay  `gorm:"FOREIGNKEY:AuthorName;"`
-
-	SignInIP string `gorm:"size:128"`
-	SignUpIP string `gorm:"size:128"`
+	Articles   []Article `gorm:"foreignkey:AuthorName;association_foreignkey:Name"`
+	Replays    []Replay  `gorm:"foreignkey:AuthorName;association_foreignkey:Name"`
+	SignInIP   string    `gorm:"size:128"`
+	SignUpIP   string    `gorm:"size:128"`
 }
 
 const (
