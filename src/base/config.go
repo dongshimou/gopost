@@ -7,6 +7,7 @@ import (
 )
 
 type Configs struct {
+	Debug bool `json:"debug"`
 	Database Database `json:"database"`
 	Server   Server   `json:"server"`
 	Token    Token    `json:"token"`
@@ -66,4 +67,5 @@ func readConfig() {
 		logger.Print(err)
 	}
 	gConfig = &c
+	logger.SetDebugStatus(gConfig.Debug)
 }
