@@ -31,4 +31,5 @@ before_script:
   - export GOPATH=$TRAVIS_BUILD_DIR:$GOPATH
 
 deploy:
+  provider: script
   script: ./run.sh
