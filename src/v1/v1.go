@@ -23,7 +23,7 @@ func InitV1() error {
 	if logger.DEBUG {
 		controller.GetDB().Create(&model.User{
 			Name:     scfg.Name,
-			Password: "123456",
+			Password: utility.EncryptPassword(scfg.Pass),
 			Permission: utility.CreatePermission(
 				model.Article_Read,
 				model.Article_Update,

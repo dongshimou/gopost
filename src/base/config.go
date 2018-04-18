@@ -24,8 +24,8 @@ type Server struct {
 	Link        string `json:"link"`
 	Description string `json:"description"`
 	Name        string `json:"name"`
+	Pass        string `json:"pass"`
 	Email       string `json:"email"`
-
 	Port string `json:"port"`
 }
 type Token struct {

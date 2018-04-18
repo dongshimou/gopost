@@ -12,8 +12,8 @@
     "link":"http://127.0.0.1/",
     "description":"my blog",
     "name":"skadi",
+    "pass":"123456",
     "email":"xx@xx.com",
-
     "port":"12345"
   },
   "token":{
