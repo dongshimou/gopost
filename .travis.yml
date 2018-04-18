@@ -3,7 +3,8 @@ language: go
 os: linux
 
 go:
-  - 1.10
+  - 1.9.x
+  - 1.10.x
   - master
 
 install: true
