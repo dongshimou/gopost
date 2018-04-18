@@ -27,5 +27,5 @@ before_script:
   - go get github.com/gorilla/feeds
   - go get github.com/jinzhu/gorm
   - go get github.com/kardianos/govendor
-  - govendor init
-  - govendor add +e
+  - export GOPATH=$TRAVIS_BUILD_DIR:$GOPATH
+
