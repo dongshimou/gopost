@@ -9,7 +9,8 @@ go:
 
 install: true
 before_deploy:
-  - GOOS=linux GOARCH=amd64 go build -o ./bin/linux_amd64
+#  - GOOS=linux GOARCH=amd64 go build -o ./bin/linux_amd64
+  - go build -o ./bin/gopost
 matrix:
   # It's ok if our code fails on unstable development versions of Go.
   allow_failures:
@@ -29,3 +30,6 @@ before_script:
   - go get github.com/kardianos/govendor
   - export GOPATH=$TRAVIS_BUILD_DIR:$GOPATH
 
+deploy:
+  - cd ./bin
+  - ./gopost
