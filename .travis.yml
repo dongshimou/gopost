@@ -3,12 +3,13 @@ language: go
 os: linux
 
 go:
-  - 1.9.x
+#  - 1.9.x
   - 1.10.x
-  - master
+#  - master
 
 install: true
-
+before_deploy:
+  - GOOS=linux GOARCH=amd64 go build -o ./bin/linux_amd64
 matrix:
   # It's ok if our code fails on unstable development versions of Go.
   allow_failures:
@@ -25,3 +26,6 @@ before_script:
   - go get github.com/go-sql-driver/mysql
   - go get github.com/gorilla/feeds
   - go get github.com/jinzhu/gorm
+  - go get github.com/kardianos/govendor
+  - govendor init
+  - govendor add +e

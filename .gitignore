@@ -14,7 +14,7 @@
 .glide/
 
 # config file
-src/gopost/develop.json
+develop.json
 .idea/
 
 pkg/
