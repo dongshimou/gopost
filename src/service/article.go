@@ -5,6 +5,7 @@ import (
 	"model"
 	"utility"
 	"logger"
+	"time"
 )
 
 func PostArticle(req *model.REQNewArticle) error {
@@ -44,9 +45,17 @@ commit:
 	return nil
 }
 func GetArticles(req *model.REQGetArticles)(*model.RESGetArticles,error){
-	befor,err:=parseTime(req.Time)
-	if err!=nil{
-	return nil,err
+
+	t1,errT1:=parseTime(req.Time)
+	t2,errT2:=parseUnix(req.Time)
+	if errT1!=nil&&errT2!=nil{
+	return nil,utility.NewError(utility.ERROR_REQUEST_CODE,utility.ERROR_REQUEST_MSG)
+	}
+	var befor time.Time
+	if errT1==nil{
+	befor=t1
+	}else{
+	befor=t2
 	}
 	limit,err:=parseCount(req.Size)
 	if err!=nil{
@@ -62,6 +71,13 @@ func GetArticles(req *model.REQGetArticles)(*model.RESGetArticles,error){
 	Find(&arts).Error;err!=nil{
 		return nil,err
 	}
+
+	for i,_:=range arts{
+		if err=db.Model(&arts[i]).Select("name").Related(&arts[i].Tags,"tags").Error;err!=nil{
+			return nil,err
+		}
+	}
+
 	resData:=make([]model.RESGetArticle,len(arts))
 	for i,a:=range arts{
 		resData[i]=model.RESGetArticle{
@@ -108,7 +124,7 @@ query:
 		return nil, err
 	}
 	//查询tags
-	if err := db.Model(&article).Related(&article.Tags, "tags").Error; err != nil {
+	if err := db.Model(&article).Select("name").Related(&article.Tags, "tags").Error; err != nil {
 		//db.Model(&article).Association("tags").Find(&article.Tags)
 		return nil, err
 	}
