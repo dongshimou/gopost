@@ -16,6 +16,9 @@ type RESSignIn struct {
 }
 type RESSignUp struct {
 }
+type RESGetArticles struct {
+	Articles []RESGetArticle `json:"articles"`
+}
 type RESGetArticle struct {
 	Aid            uint     `json:"aid"`
 	Title          string   `json:"title"`

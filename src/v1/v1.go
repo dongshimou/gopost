@@ -68,6 +68,13 @@ func GetUserFromToken(token string) (*model.User, error) {
 
 var routes = []Route{
 	Route{
+	"GetAllArticle",
+	"GET",
+	pathVer+"/article",
+	handler.GetArticles,
+	MakeAuth(model.Article_Read),
+	},
+	Route{
 		"PostArticle",
 		"POST",
 		pathVer + "/article",

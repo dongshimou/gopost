@@ -4,7 +4,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"model"
 	"service"
-	"sync"
 )
 
 func PostReplay(c *gin.Context) {
@@ -26,10 +25,6 @@ fail:
 	DoResponseFail(c, err)
 }
 func GetReplays(c *gin.Context) {
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
 		var req model.REQGetReplays
 		var res *model.RESGetReplays
 		var err error
@@ -48,8 +43,6 @@ func GetReplays(c *gin.Context) {
 
 	fail:
 		DoResponseFail(c, err)
-	}()
-	wg.Wait()
 }
 func DelReplays(c *gin.Context) {
 	var req model.REQDelReplays
@@ -72,10 +65,6 @@ fail:
 	DoResponseFail(c, err)
 }
 func GetUserInfo(c *gin.Context) {
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
 		var req model.REQGetUserInfo
 		var res *model.RESGetUserInfo
 		var err error
@@ -94,15 +83,23 @@ func GetUserInfo(c *gin.Context) {
 
 	fail:
 		DoResponseFail(c, err)
-	}()
-
-	wg.Wait()
+}
+func GetArticles(c *gin.Context)  {
+	var req model.REQGetArticles
+		var res *model.RESGetArticles
+		var err error
+		if err=c.Bind(&req);err!=nil{
+		goto fail
+		}
+		if res, err = service.GetArticles(&req); err != nil {
+			goto fail
+		}
+		DoResponseOK(c, res)
+		return
+	fail:
+		DoResponseFail(c, err)
 }
 func GetArticle(c *gin.Context) {
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
 		var req model.REQGetArticle
 		var res *model.RESGetArticle
 		var err error
@@ -121,8 +118,6 @@ func GetArticle(c *gin.Context) {
 		return
 	fail:
 		DoResponseFail(c, err)
-	}()
-	wg.Wait()
 }
 func PostArticle(c *gin.Context) {
 	var req model.REQNewArticle

@@ -43,6 +43,48 @@ commit:
 	tx.Commit()
 	return nil
 }
+func GetArticles(req *model.REQGetArticles)(*model.RESGetArticles,error){
+	befor,err:=parseTime(req.Time)
+	if err!=nil{
+	return nil,err
+	}
+	limit,err:=parseCount(req.Size)
+	if err!=nil{
+	return nil,err
+	}
+	arts:=[]model.Article{}
+
+	db:=controller.GetDB()
+	if err=db.Model(&model.Article{}).
+	Where("created_at < ?",befor).
+	Order(buildArgs(" ", model.DB_created_at, model.DB_desc)).
+	Limit(limit).
+	Find(&arts).Error;err!=nil{
+		return nil,err
+	}
+	resData:=make([]model.RESGetArticle,len(arts))
+	for i,a:=range arts{
+		resData[i]=model.RESGetArticle{
+		a.ID,
+		a.Title,
+		a.AuthorName,
+			func(tags []*model.Tag) []string {
+				ts := []string{}
+				for i, _ := range tags {
+					ts = append(ts, tags[i].Name)
+				}
+				return ts
+			}(a.Tags),
+			a.Context,
+			a.ReplayCount,
+			formatDatetime(a.CreatedAt),
+			formatDatetime(a.UpdatedAt),
+"",
+"",
+		}
+	}
+	return &model.RESGetArticles{resData},nil
+}
 func GetArticle(req *model.REQGetArticle) (*model.RESGetArticle, error) {
 	article := model.Article{}
 	if !isNullOrEmpty(req.Aid) {

@@ -18,6 +18,12 @@ func parseID(s string) (uint, error) {
 func parseCount(s string) (uint, error) {
 	return parse2uint(s)
 }
+func parseTime(s string)(time.Time,error){
+	return utility.ParseTime(s)
+}
+func parsrDate(s string)(time.Time,error){
+	return utility.ParseDate(s)
+}
 func formatDatetime(time time.Time) string {
 	return utility.FormatDatetime(time)
 }
