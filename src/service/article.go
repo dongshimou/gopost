@@ -66,7 +66,6 @@ func GetArticles(req *model.REQGetArticles)(*model.RESGetArticles,error){
 	db:=controller.GetDB()
 	if err=db.Model(&model.Article{}).
 	Where("created_at < ?",befor).
-	Order(buildArgs(" ", model.DB_created_at, model.DB_desc)).
 	Limit(limit).
 	Find(&arts).Error;err!=nil{
 		return nil,err
@@ -79,7 +78,8 @@ func GetArticles(req *model.REQGetArticles)(*model.RESGetArticles,error){
 	}
 
 	resData:=make([]model.RESGetArticle,len(arts))
-	for i,a:=range arts{
+	for i:=len(arts);i>=0;i--{
+		a:=&arts[i]
 		resData[i]=model.RESGetArticle{
 		a.ID,
 		a.Title,
