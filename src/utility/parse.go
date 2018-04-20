@@ -78,9 +78,9 @@ func safe_s2i64(s string) int64 {
 	id, _ := err_s2i64(s)
 	return id
 }
-func ParseDate(datetime string)(time.Time,error){
-	return time.ParseInLocation("2006-01-02",datetime,time.Local)
+func ParseDate(datetime string) (time.Time, error) {
+	return time.ParseInLocation("2006-01-02", datetime, time.Local)
 }
-func ParseTime(datetime string) (time.Time,error) {
-	return time.ParseInLocation("2006-01-02 15:04:05", datetime,time.Local)
+func ParseTime(datetime string) (time.Time, error) {
+	return time.ParseInLocation("2006-01-02 15:04:05", datetime, time.Local)
 }

@@ -7,7 +7,7 @@ import (
 )
 
 type Configs struct {
-	Debug bool `json:"debug"`
+	Debug    bool     `json:"debug"`
 	Database Database `json:"database"`
 	Server   Server   `json:"server"`
 	Token    Token    `json:"token"`
@@ -26,7 +26,7 @@ type Server struct {
 	Name        string `json:"name"`
 	Pass        string `json:"pass"`
 	Email       string `json:"email"`
-	Port string `json:"port"`
+	Port        string `json:"port"`
 }
 type Token struct {
 	SecretKey string `json:"secret_key"`

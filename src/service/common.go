@@ -18,17 +18,17 @@ func parseID(s string) (uint, error) {
 func parseCount(s string) (uint, error) {
 	return parse2uint(s)
 }
-func parseTime(s string)(time.Time,error){
+func parseTime(s string) (time.Time, error) {
 	return utility.ParseTime(s)
 }
-func parseUnix(s string)(time.Time,error){
-	i,err:=utility.Parse2Int64(s)
-	if err!=nil{
-	return time.Time{},err
+func parseUnix(s string) (time.Time, error) {
+	i, err := utility.Parse2Int64(s)
+	if err != nil {
+		return time.Time{}, err
 	}
-	return time.Unix( i,0),nil
+	return time.Unix(i, 0), nil
 }
-func parsrDate(s string)(time.Time,error){
+func parsrDate(s string) (time.Time, error) {
 	return utility.ParseDate(s)
 }
 func formatDatetime(time time.Time) string {

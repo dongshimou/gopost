@@ -9,14 +9,14 @@ var (
 func SetDebug() {
 	openDebug()
 }
-func openDebug(){
-	DEBUG=true
+func openDebug() {
+	DEBUG = true
 }
-func closeDebug(){
-	DEBUG=true
+func closeDebug() {
+	DEBUG = true
 }
-func SetDebugStatus(s bool){
-	DEBUG=s
+func SetDebugStatus(s bool) {
+	DEBUG = s
 }
 func Debug(args ...interface{}) {
 	if DEBUG {

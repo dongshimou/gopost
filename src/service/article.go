@@ -2,10 +2,10 @@ package service
 
 import (
 	"controller"
-	"model"
-	"utility"
 	"logger"
+	"model"
 	"time"
+	"utility"
 )
 
 func PostArticle(req *model.REQNewArticle) error {
@@ -44,46 +44,47 @@ commit:
 	tx.Commit()
 	return nil
 }
-func GetArticles(req *model.REQGetArticles)(*model.RESGetArticles,error){
+func GetArticles(req *model.REQGetArticles) (*model.RESGetArticles, error) {
 
-	t1,errT1:=parseTime(req.Time)
-	t2,errT2:=parseUnix(req.Time)
-	if errT1!=nil&&errT2!=nil{
-	return nil,utility.NewError(utility.ERROR_REQUEST_CODE,utility.ERROR_REQUEST_MSG)
+	t1, errT1 := parseTime(req.Time)
+	t2, errT2 := parseUnix(req.Time)
+	if errT1 != nil && errT2 != nil {
+		return nil, utility.NewError(utility.ERROR_REQUEST_CODE, utility.ERROR_REQUEST_MSG)
 	}
 	var befor time.Time
-	if errT1==nil{
-	befor=t1
-	}else{
-	befor=t2
+	if errT1 == nil {
+		befor = t1
+	} else {
+		befor = t2
 	}
-	limit,err:=parseCount(req.Size)
-	if err!=nil{
-	return nil,err
+	limit, err := parseCount(req.Size)
+	if err != nil {
+		return nil, err
 	}
-	arts:=[]model.Article{}
+	arts := []model.Article{}
 
-	db:=controller.GetDB()
-	if err=db.Model(&model.Article{}).
-	Where("created_at < ?",befor).
-	Limit(limit).
-	Find(&arts).Error;err!=nil{
-		return nil,err
+	db := controller.GetDB()
+	if err = db.Model(&model.Article{}).
+		Where("created_at < ?", befor).
+		Order("created_at desc").
+		Limit(limit).
+		Find(&arts).Error; err != nil {
+		return nil, err
 	}
 
-	for i,_:=range arts{
-		if err=db.Model(&arts[i]).Select("name").Related(&arts[i].Tags,"tags").Error;err!=nil{
-			return nil,err
+	for i, _ := range arts {
+		if err = db.Model(&arts[i]).Select("name").Related(&arts[i].Tags, "tags").Error; err != nil {
+			return nil, err
 		}
 	}
 
-	resData:=make([]model.RESGetArticle,len(arts))
-	for i:=len(arts);i>=0;i--{
-		a:=&arts[i]
-		resData[i]=model.RESGetArticle{
-		a.ID,
-		a.Title,
-		a.AuthorName,
+	resData := make([]model.RESGetArticle, len(arts))
+	for i := 0; i < len(arts); i++ {
+		a := &arts[i]
+		resData[i] = model.RESGetArticle{
+			a.ID,
+			a.Title,
+			a.AuthorName,
 			func(tags []*model.Tag) []string {
 				ts := []string{}
 				for i, _ := range tags {
@@ -95,11 +96,11 @@ func GetArticles(req *model.REQGetArticles)(*model.RESGetArticles,error){
 			a.ReplayCount,
 			formatDatetime(a.CreatedAt),
 			formatDatetime(a.UpdatedAt),
-"",
-"",
+			"",
+			"",
 		}
 	}
-	return &model.RESGetArticles{resData},nil
+	return &model.RESGetArticles{resData}, nil
 }
 func GetArticle(req *model.REQGetArticle) (*model.RESGetArticle, error) {
 	article := model.Article{}
@@ -131,8 +132,8 @@ query:
 	next := model.Article{}
 	prev := model.Article{}
 	//上一篇和下一篇
-	db.Model(&prev).Where("id < ?",article.ID).Select("title").Last(&prev)
-	db.Model(&next).Where("id > ?",article.ID).Select("title").First(&next)
+	db.Model(&prev).Where("id < ?", article.ID).Select("title").Last(&prev)
+	db.Model(&next).Where("id > ?", article.ID).Select("title").First(&next)
 	res := model.RESGetArticle{
 		Aid:         article.ID,
 		Title:       article.Title,
@@ -190,19 +191,19 @@ func PostReplay(req *model.REQNewReplay) (err error) {
 		return err
 	}
 	replay := model.Replay{
-		ArticleTitle:      article.Title,
-		AuthorName: user.Name,
-		Context:    req.Context,
-		Count:      article.ReplayCount + 1,
+		ArticleTitle: article.Title,
+		AuthorName:   user.Name,
+		Context:      req.Context,
+		Count:        article.ReplayCount + 1,
 	}
 	tx := db.Begin()
 	if err = tx.Save(&replay).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
-	article.ReplayCount+=1
-	where:=model.Article{}
-	where.ID=article.ID
+	article.ReplayCount += 1
+	where := model.Article{}
+	where.ID = article.ID
 	if err = tx.Model(&article).Where(&where).Update(article).Error; err != nil {
 		tx.Rollback()
 		return err
@@ -221,14 +222,14 @@ func GetArticleReplays(req *model.REQGetReplays) (*model.RESGetReplays, error) {
 		return nil, err
 	}
 
-	if err:=db.Model(&article).
-	Select(buildArgs(",", model.DB_id,model.Table_Replay_AuthorName, model.Table_Replay_Context, model.DB_created_at)).
-	Order(buildArgs(" ", model.Table_Replay_Count, model.DB_desc)).
-	Related(&article.Replays,"Replays").Error;err!=nil{
-		return nil,err
+	if err := db.Model(&article).
+		Select(buildArgs(",", model.DB_id, model.Table_Replay_AuthorName, model.Table_Replay_Context, model.DB_created_at)).
+		Order(buildArgs(" ", model.Table_Replay_Count, model.DB_desc)).
+		Related(&article.Replays, "Replays").Error; err != nil {
+		return nil, err
 	}
 
-	res:=model.RESGetReplays{}
+	res := model.RESGetReplays{}
 	res.Aid = article.ID
 	res.ArticleTitle = article.Title
 
