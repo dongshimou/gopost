@@ -16,6 +16,7 @@ func closeDebug() {
 	DEBUG = true
 }
 func SetDebugStatus(s bool) {
+	log.Println("DEBUG status ========= ",s)
 	DEBUG = s
 }
 func Debug(args ...interface{}) {
