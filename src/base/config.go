@@ -27,6 +27,9 @@ type Server struct {
 	Pass        string `json:"pass"`
 	Email       string `json:"email"`
 	Port        string `json:"port"`
+	TLS         bool   `json:"tls"`
+	CertFile    string `json:"cert_file"`
+	KeyFile     string `json:"key_file"`
 }
 type Token struct {
 	SecretKey string `json:"secret_key"`
