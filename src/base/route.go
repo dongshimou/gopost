@@ -48,6 +48,6 @@ func StartService() {
 	if GetConfig().Server.TLS {
 		router.RunTLS(address, GetConfig().Server.CertFile,GetConfig().Server.KeyFile)
 	}else{
-		router.Run()
+		router.Run(address)
 	}
 }
