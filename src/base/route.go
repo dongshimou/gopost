@@ -47,12 +47,12 @@ func StartService() {
 			router.DELETE(pattern, hanlders...)
 		}
 	}
-	address:=":" + GetConfig().Server.Port
+	address := ":" + GetConfig().Server.Port
 	if GetConfig().Server.TLS {
-		logger.Debug("cert file:",GetConfig().Server.CertFile)
-		logger.Debug("key file:",GetConfig().Server.KeyFile)
-		router.RunTLS(address, GetConfig().Server.CertFile,GetConfig().Server.KeyFile)
-	}else{
+		logger.Debug("cert file:", GetConfig().Server.CertFile)
+		logger.Debug("key file:", GetConfig().Server.KeyFile)
+		router.RunTLS(address, GetConfig().Server.CertFile, GetConfig().Server.KeyFile)
+	} else {
 		logger.Debug("no tls")
 		router.Run(address)
 	}

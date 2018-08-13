@@ -1,14 +1,15 @@
 package base
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
-	"strconv"
-	"errors"
 )
+
 type cors struct {
 	allowAllOrigins  bool
 	allowCredentials bool

@@ -82,11 +82,11 @@ var routes = []Route{
 		MakeAuth(model.Article_Create),
 	},
 	Route{
-	"UpdateArticle",
-	"POST",
-	pathVer+"/article/update/:title",
-	handler.UpdateArticle,
-	MakeAuth(model.Article_Update),
+		"UpdateArticle",
+		"POST",
+		pathVer + "/article/update/:title",
+		handler.UpdateArticle,
+		MakeAuth(model.Article_Update),
 	},
 	Route{
 		"GetArticle",
@@ -105,14 +105,14 @@ var routes = []Route{
 	Route{
 		"GetTags",
 		"GET",
-		pathVer+"/tags/:title",
+		pathVer + "/tags/:title",
 		handler.GetTags,
 		MakeAuth(model.Article_Read),
 	},
 	Route{
 		"GetAllTags",
 		"GET",
-		pathVer+"/tags",
+		pathVer + "/tags",
 		handler.GetAllTags,
 		MakeAuth(model.Article_Read),
 	},

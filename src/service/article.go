@@ -2,28 +2,28 @@ package service
 
 import (
 	"controller"
+	"github.com/jinzhu/gorm"
 	"logger"
 	"model"
 	"time"
 	"utility"
-	"github.com/jinzhu/gorm"
 )
 
 func CreateArticle(req *model.REQNewArticle) error {
 
 	db := controller.GetDB().Begin()
-	if err:= createOrupdateArticle(db,req,1);err!=nil{
+	if err := createOrupdateArticle(db, req, 1); err != nil {
 		db.Rollback()
 		return err
 	}
 	db.Commit()
 	return nil
 }
-func createOrupdateArticle(tx *gorm.DB,req *model.REQNewArticle, create_update int)error{
+func createOrupdateArticle(tx *gorm.DB, req *model.REQNewArticle, create_update int) error {
 	tags := []*model.Tag{}
 	for i, _ := range req.Tags {
 		t := model.Tag{Name: req.Tags[i]}
-		if err:=tx.FirstOrCreate(&t, &t).Error;err!=nil{
+		if err := tx.FirstOrCreate(&t, &t).Error; err != nil {
 			return err
 		}
 		tags = append(tags, &t)
@@ -34,22 +34,26 @@ func createOrupdateArticle(tx *gorm.DB,req *model.REQNewArticle, create_update i
 		Tags:       tags,
 		AuthorName: req.CurrUser.Name,
 	}
-	if create_update ==1 {
+	if create_update == 1 {
 		if err := tx.Save(&post).Error; err != nil {
 			return err
 		}
-		logger.Debug("create",req.Title,"success")
-	}else{
-		if err:=tx.Model(&model.Article{}).Where(&model.Article{Title:req.Title}).Update(&post).Error;err!=nil{
+		logger.Debug("create", req.Title, "success")
+	} else {
+		art := model.Article{}
+		if err := tx.Model(&model.Article{}).Where(&model.Article{Title: req.Title}).Last(&art).Error; err != nil {
 			return err
 		}
-		logger.Debug("update",req.Title,"success")
+		if err := tx.Model(&art).Update(&post).Error; err != nil {
+			return err
+		}
+		logger.Debug("update", req.Title, "success")
 	}
 	return nil
 }
-func UpdateArticle(req *model.REQNewArticle)error{
-	db:=controller.GetDB().Begin()
-	if err:= createOrupdateArticle(db,req,2);err!=nil{
+func UpdateArticle(req *model.REQNewArticle) error {
+	db := controller.GetDB().Begin()
+	if err := createOrupdateArticle(db, req, 2); err != nil {
 		db.Rollback()
 		return err
 	}
@@ -184,35 +188,35 @@ func DelArticle(req *model.REQDelArticle) (err error) {
 	tx.Commit()
 	return nil
 }
-func GetTags(req *model.REQGetTags)(*model.RESGetTags,error){
+func GetTags(req *model.REQGetTags) (*model.RESGetTags, error) {
 
-	db:=controller.GetDB()
-	art:=model.Article{Title:req.Title}
-	if err:=db.Model(&model.Article{}).Where(&art).Last(&art).Error;err!=nil{
-		return nil,err
+	db := controller.GetDB()
+	art := model.Article{Title: req.Title}
+	if err := db.Model(&model.Article{}).Where(&art).Last(&art).Error; err != nil {
+		return nil, err
 	}
-	if err:=db.Model(&art).
-		Select("name").Related(&art.Tags, "tags").Error;err!=nil{
-		return nil,err
+	if err := db.Model(&art).
+		Select("name").Related(&art.Tags, "tags").Error; err != nil {
+		return nil, err
 	}
-	res:=model.RESGetTags{}
-	for _,v:=range art.Tags{
-		res.Names=append(res.Names,v.Name)
+	res := model.RESGetTags{}
+	for _, v := range art.Tags {
+		res.Names = append(res.Names, v.Name)
 	}
-	return &res,nil
+	return &res, nil
 }
-func GetAllTags()(*model.RESGetTags,error){
-	db:=controller.GetDB()
+func GetAllTags() (*model.RESGetTags, error) {
+	db := controller.GetDB()
 
-	tags:=[]model.Tag{}
-	if err:=db.Model(&model.Tag{}).Select("name").Find(&tags).Error;err!=nil{
-		return nil,err
+	tags := []model.Tag{}
+	if err := db.Model(&model.Tag{}).Select("name").Find(&tags).Error; err != nil {
+		return nil, err
 	}
-	res:=model.RESGetTags{}
-	for _,v:=range tags{
-		res.Names=append(res.Names,v.Name)
+	res := model.RESGetTags{}
+	for _, v := range tags {
+		res.Names = append(res.Names, v.Name)
 	}
-	return &res,nil
+	return &res, nil
 }
 func PostReplay(req *model.REQNewReplay) (err error) {
 	if isNullOrEmpty(req.Title) || isNullOrEmpty(req.Context) {
