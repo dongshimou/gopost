@@ -47,15 +47,15 @@ func GetConfig() *Configs {
 	return gConfig
 }
 func read() ([]byte, error) {
-	logger.Print("=== read develop config ===")
-	file, err := ioutil.ReadFile("./develop.json")
+	logger.Print("=== read product config ===")
+	file, err := ioutil.ReadFile("./product.json")
 	if err != nil {
-		logger.Debug("can't find config : develop.json")
+		logger.Debug("can't find config : product.json")
 	} else {
 		return file, err
 	}
-	logger.Print("=== read product config ===")
-	return ioutil.ReadFile("./product.json")
+	logger.Print("=== read develop config ===")
+	return ioutil.ReadFile("./develop.json")
 }
 func readConfig() {
 	file, err := read()
