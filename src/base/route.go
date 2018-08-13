@@ -1,6 +1,9 @@
 package base
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"logger"
+)
 
 type Route struct {
 	Name        string
@@ -46,6 +49,7 @@ func StartService() {
 	}
 	address:=":" + GetConfig().Server.Port
 	if GetConfig().Server.TLS {
+		logger.Debug(GetConfig().Server.CertFile,GetConfig().Server.KeyFile)
 		router.RunTLS(address, GetConfig().Server.CertFile,GetConfig().Server.KeyFile)
 	}else{
 		router.Run(address)
