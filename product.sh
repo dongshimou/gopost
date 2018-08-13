@@ -1,5 +1,6 @@
 #!/bin/bash
 
+git pull origin master
 
 cd `dirname $0`
 
@@ -7,11 +8,13 @@ export GIN_MODE=release
 
 basepath=$(cd `dirname $0`; pwd)
 
-export GOPATH=$basepath:$GOPATH
+export GOPATH=$GOPATH:$basepath
 
 echo $GOPATH
 
 echo 'go path = ' $GOPATH
+
+cd ./src
 
 govendor init
 
@@ -28,6 +31,8 @@ govendor get github.com/go-sql-driver/mysql
 govendor get github.com/gorilla/feeds
 
 govendor get github.com/jinzhu/gorm
+
+cd ../
 
 go build -o ../bin/gopost
 
