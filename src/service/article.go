@@ -6,42 +6,54 @@ import (
 	"model"
 	"time"
 	"utility"
+	"github.com/jinzhu/gorm"
 )
 
-func PostArticle(req *model.REQNewArticle) error {
+func CreateArticle(req *model.REQNewArticle) error {
 
-	user := req.CurrUser
-	if user == nil {
-		return utility.NewError(utility.ERROR_AUTH_CODE, utility.ERROR_MSG_UNKNOW_USER)
+	db := controller.GetDB().Begin()
+	if err:= createOrupdateArticle(db,req,1);err!=nil{
+		db.Rollback()
+		return err
 	}
-	db := controller.GetDB()
-
+	db.Commit()
+	return nil
+}
+func createOrupdateArticle(tx *gorm.DB,req *model.REQNewArticle, create_update int)error{
 	tags := []*model.Tag{}
 	for i, _ := range req.Tags {
 		t := model.Tag{Name: req.Tags[i]}
-		db.FirstOrCreate(&t, &t)
+		if err:=tx.FirstOrCreate(&t, &t).Error;err!=nil{
+			return err
+		}
 		tags = append(tags, &t)
 	}
-
 	post := model.Article{
 		Title:      req.Title,
 		Context:    req.Context,
 		Tags:       tags,
-		AuthorName: user.Name,
+		AuthorName: req.CurrUser.Name,
 	}
-
-	tx := db.Begin()
-	var err error
-	if err = tx.Save(&post).Error; err != nil {
-		goto rollback
+	if create_update ==1 {
+		if err := tx.Save(&post).Error; err != nil {
+			return err
+		}
+		logger.Debug("create",req.Title,"success")
+	}else{
+		if err:=tx.Model(&model.Article{}).Where(&model.Article{Title:req.Title}).Update(&post).Error;err!=nil{
+			return err
+		}
+		logger.Debug("update",req.Title,"success")
 	}
-	goto commit
-
-rollback:
-	tx.Rollback()
-	return err
-commit:
-	tx.Commit()
+	return nil
+}
+func UpdateArticle(req *model.REQNewArticle)error{
+	db:=controller.GetDB().Begin()
+	if err:= createOrupdateArticle(db,req,2);err!=nil{
+		db.Rollback()
+		return err
+	}
+	db.Commit()
 	return nil
 }
 func GetArticles(req *model.REQGetArticles) (*model.RESGetArticles, error) {
@@ -137,7 +149,9 @@ query:
 	prev := model.Article{}
 	//上一篇和下一篇
 	db.Model(&prev).Where("id < ?", article.ID).Select("title").Last(&prev)
+	//db.Model(&prev).Where("created_at < ?", article.CreatedAt).Select("title").Last(&prev)
 	db.Model(&next).Where("id > ?", article.ID).Select("title").First(&next)
+	//db.Model(&next).Where("created_at > ?", article.CreatedAt).Select("title").First(&next)
 	res := model.RESGetArticle{
 		Aid:         article.ID,
 		Title:       article.Title,
@@ -169,6 +183,36 @@ func DelArticle(req *model.REQDelArticle) (err error) {
 	}
 	tx.Commit()
 	return nil
+}
+func GetTags(req *model.REQGetTags)(*model.RESGetTags,error){
+
+	db:=controller.GetDB()
+	art:=model.Article{Title:req.Title}
+	if err:=db.Model(&model.Article{}).Where(&art).Last(&art).Error;err!=nil{
+		return nil,err
+	}
+	if err:=db.Model(&art).
+		Select("name").Related(&art.Tags, "tags").Error;err!=nil{
+		return nil,err
+	}
+	res:=model.RESGetTags{}
+	for _,v:=range art.Tags{
+		res.Names=append(res.Names,v.Name)
+	}
+	return &res,nil
+}
+func GetAllTags()(*model.RESGetTags,error){
+	db:=controller.GetDB()
+
+	tags:=[]model.Tag{}
+	if err:=db.Model(&model.Tag{}).Select("name").Find(&tags).Error;err!=nil{
+		return nil,err
+	}
+	res:=model.RESGetTags{}
+	for _,v:=range tags{
+		res.Names=append(res.Names,v.Name)
+	}
+	return &res,nil
 }
 func PostReplay(req *model.REQNewReplay) (err error) {
 	if isNullOrEmpty(req.Title) || isNullOrEmpty(req.Context) {

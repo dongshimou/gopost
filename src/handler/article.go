@@ -119,7 +119,7 @@ func GetArticle(c *gin.Context) {
 fail:
 	DoResponseFail(c, err)
 }
-func PostArticle(c *gin.Context) {
+func CreateArticle(c *gin.Context) {
 	var req model.REQNewArticle
 	var err error
 	if req.CurrUser, err = getCurrUser(c); err != nil {
@@ -128,7 +128,25 @@ func PostArticle(c *gin.Context) {
 	if err = c.Bind(&req); err != nil {
 		goto fail
 	}
-	if err = service.PostArticle(&req); err != nil {
+	if err = service.CreateArticle(&req); err != nil {
+		goto fail
+
+	}
+	DoResponseOK(c, nil)
+	return
+fail:
+	DoResponseFail(c, err)
+}
+func UpdateArticle(c *gin.Context){
+	var req model.REQNewArticle
+	var err error
+	if req.CurrUser, err = getCurrUser(c); err != nil {
+		goto fail
+	}
+	if err = c.Bind(&req); err != nil {
+		goto fail
+	}
+	if err = service.UpdateArticle(&req); err != nil {
 		goto fail
 
 	}
@@ -154,4 +172,26 @@ func DelArticle(c *gin.Context) {
 	return
 fail:
 	DoResponseFail(c, err)
+}
+func GetTags(c *gin.Context){
+	var res *model.RESGetTags
+	var err error
+	if res,err= func()(*model.RESGetTags,error) {
+		var req model.REQGetTags
+		req.Title=c.Param("title")
+		if err:=c.Bind(&req);err!=nil{
+			return nil,err
+		}
+		return service.GetTags(&req)
+	}();err!=nil{
+		DoResponseFail(c,err)
+	}
+	DoResponseOK(c,res)
+}
+func GetAllTags(c *gin.Context){
+	 res,err:= service.GetAllTags()
+	 if err!=nil{
+	    DoResponseFail(c,err)
+	 }
+	 DoResponseOK(c,res)
 }

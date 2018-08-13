@@ -61,3 +61,7 @@ type RESGetUserInfo struct {
 		CreateDatetime string `json:"create_datetime"`
 	} `json:"post_replay"`
 }
+
+type RESGetTags struct {
+	Names []string `json:"names"`
+}
