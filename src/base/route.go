@@ -49,9 +49,11 @@ func StartService() {
 	}
 	address:=":" + GetConfig().Server.Port
 	if GetConfig().Server.TLS {
-		logger.Debug(GetConfig().Server.CertFile,GetConfig().Server.KeyFile)
+		logger.Debug("cert file:",GetConfig().Server.CertFile)
+		logger.Debug("key file:",GetConfig().Server.KeyFile)
 		router.RunTLS(address, GetConfig().Server.CertFile,GetConfig().Server.KeyFile)
 	}else{
+		logger.Debug("no tls")
 		router.Run(address)
 	}
 }
