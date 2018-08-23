@@ -2,6 +2,7 @@ package service
 
 import (
 	"controller"
+	"errors"
 	"github.com/jinzhu/gorm"
 	"logger"
 	"model"
@@ -93,7 +94,8 @@ func GetArticles(req *model.REQGetArticles) (*model.RESGetArticles, error) {
 	}
 
 	for i, _ := range arts {
-		if err = db.Model(&arts[i]).Select("name").Related(&arts[i].Tags, "tags").Error; err != nil {
+		if err = db.Model(&arts[i]).Select("name").
+			Related(&arts[i].Tags, "tags").Error; err != nil {
 			return nil, err
 		}
 	}
@@ -113,7 +115,6 @@ func GetArticles(req *model.REQGetArticles) (*model.RESGetArticles, error) {
 				return ts
 			}(a.Tags),
 			a.Context,
-			a.ReplayCount,
 			formatDatetime(a.CreatedAt),
 			formatDatetime(a.UpdatedAt),
 			"",
@@ -145,7 +146,8 @@ query:
 		return nil, err
 	}
 	//查询tags
-	if err := db.Model(&article).Select("name").Related(&article.Tags, "tags").Error; err != nil {
+	if err := db.Model(&article).Select("name").
+		Related(&article.Tags, "tags").Error; err != nil {
 		//db.Model(&article).Association("tags").Find(&article.Tags)
 		return nil, err
 	}
@@ -157,10 +159,9 @@ query:
 	db.Model(&next).Where("id > ?", article.ID).Select("title").First(&next)
 	//db.Model(&next).Where("created_at > ?", article.CreatedAt).Select("title").First(&next)
 	res := model.RESGetArticle{
-		Aid:         article.ID,
-		Title:       article.Title,
-		Author:      article.AuthorName,
-		ReplayCount: article.ReplayCount,
+		Aid:    article.ID,
+		Title:  article.Title,
+		Author: article.AuthorName,
 		Tags: func(tags []*model.Tag) []string {
 			ts := []string{}
 			for i, _ := range tags {
@@ -235,10 +236,10 @@ func PostReplay(req *model.REQNewReplay) (err error) {
 	article.Title = req.Title
 
 	db := controller.GetDB()
-	logger.Print(buildArgs(",", model.DB_id, model.Table_Article_Title, model.Table_Article_ReplayCount))
+	logger.Print(buildArgs(",", model.DB_id, model.Table_Article_Title))
 	if err = db.Model(&article).
 		Where(&article).
-		Select(buildArgs(",", model.DB_id, model.Table_Article_Title, model.Table_Article_ReplayCount)).
+		Select(buildArgs(",", model.DB_id, model.Table_Article_Title)).
 		First(&article).Error; err != nil {
 		return err
 	}
@@ -246,21 +247,13 @@ func PostReplay(req *model.REQNewReplay) (err error) {
 		ArticleTitle: article.Title,
 		AuthorName:   user.Name,
 		Context:      req.Context,
-		Count:        article.ReplayCount + 1,
+		IpAddress:    req.IpAddress,
 	}
 	tx := db.Begin()
 	if err = tx.Save(&replay).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
-	article.ReplayCount += 1
-	where := model.Article{}
-	where.ID = article.ID
-	if err = tx.Model(&article).Where(&where).Update(article).Error; err != nil {
-		tx.Rollback()
-		return err
-	}
-
 	tx.Commit()
 	return nil
 }
@@ -270,12 +263,17 @@ func GetArticleReplays(req *model.REQGetReplays) (*model.RESGetReplays, error) {
 		Title: req.Title,
 	}
 	db := controller.GetDB()
-	if err := db.Model(&article).Select(model.Table_Article_Title).Where(&article).First(&article).Error; err != nil {
+	if err := db.Model(&article).Select(model.Table_Article_Title).
+		Where(&article).First(&article).Error; err != nil {
 		return nil, err
 	}
 
 	if err := db.Model(&article).
-		Select(buildArgs(",", model.DB_id, model.Table_Replay_AuthorName, model.Table_Replay_Context, model.DB_created_at)).
+		Select(buildArgs(",", model.DB_id,
+			model.Table_Replay_AuthorName,
+			model.Table_Replay_IpAddress,
+			model.Table_Replay_Context,
+			model.DB_created_at)).
 		Order(buildArgs(" ", model.Table_Replay_Count, model.DB_desc)).
 		Related(&article.Replays, "Replays").Error; err != nil {
 		return nil, err
@@ -287,12 +285,13 @@ func GetArticleReplays(req *model.REQGetReplays) (*model.RESGetReplays, error) {
 
 	for i, _ := range article.Replays {
 		v := &article.Replays[i]
-		res.Replays = append(res.Replays, struct {
-			Rid            uint   `json:"rid"`
-			Username       string `json:"username"`
-			Context        string `json:"context"`
-			CreateDatetime string `json:"create_datetime"`
-		}{Rid: v.ID, Username: v.AuthorName, Context: v.Context, CreateDatetime: formatDatetime(v.CreatedAt)})
+		res.Replays = append(res.Replays, model.RESGetReplaysSingle{
+			Rid:            v.ID,
+			Username:       v.AuthorName,
+			Context:        v.Context,
+			IpAddress:      v.IpAddress,
+			CreateDatetime: formatDatetime(v.CreatedAt),
+		})
 	}
 	return &res, nil
 }
@@ -306,15 +305,10 @@ func DelArticleReplay(req *model.REQDelReplays) (err error) {
 		}
 		replay.ID = rid
 	} else {
-		count, err := parseCount(req.Count)
-		if err != nil {
-			return err
-		}
-		replay.Count = count
-		replay.ArticleTitle = req.Title
+		return errors.New("it's not a rid")
 	}
 	tx := controller.GetDB().Begin()
-	if err = tx.Model(&replay).Where(&replay).Delete(&replay).Error; err != nil {
+	if err = tx.Model(&model.Replay{}).Where(&replay).Delete(&replay).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -350,7 +344,8 @@ func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
 		return nil, err
 	}
 	if err = db.Model(&model.User{}).
-		Select(buildArgs(",", model.Table_Replay_ArticleTitle, model.Table_Replay_Context, model.DB_created_at)).
+		Select(buildArgs(",", model.Table_Replay_ArticleTitle,
+			model.Table_Replay_Context, model.DB_created_at)).
 		Order(buildArgs(" ", model.DB_created_at, model.DB_asc)).
 		Related(&quser.Replays, "Replays").Error; err != nil {
 		return nil, err
@@ -361,20 +356,20 @@ func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
 	for i, _ := range quser.Articles {
 		v := &quser.Articles[i]
 
-		res.PostArticle = append(res.PostArticle, struct {
-			Title          string `json:"title"`
-			CreateDatetime string `json:"create_datetime"`
-		}{Title: v.Title, CreateDatetime: formatDatetime(v.CreatedAt)})
+		res.PostArticle = append(res.PostArticle, model.RESGetUserInfoArticle{
+			Title:          v.Title,
+			CreateDatetime: formatDatetime(v.CreatedAt),
+		})
 	}
 
 	for i, _ := range quser.Replays {
 		v := &quser.Replays[i]
 
-		res.PostReplay = append(res.PostReplay, struct {
-			Title          string `json:"title"`
-			Replay         string `json:"replay"`
-			CreateDatetime string `json:"create_datetime"`
-		}{Title: v.ArticleTitle, Replay: v.Context, CreateDatetime: formatDatetime(v.CreatedAt)})
+		res.PostReplay = append(res.PostReplay, model.RESGetUserInfoReplay{
+			Title:          v.ArticleTitle,
+			Replay:         v.Context,
+			CreateDatetime: formatDatetime(v.CreatedAt),
+		})
 	}
 
 	res.Username = quser.Name

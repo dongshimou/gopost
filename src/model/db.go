@@ -20,7 +20,6 @@ type Article struct {
 	AuthorName        string   `gorm:"size:255;not null;index;"`
 	Author            User     `gorm:"foreignkey:AuthorName"`
 	Context           string   `gorm:"size:65535;"`
-	ReplayCount       uint     `gorm:"default:0"`
 	Tags              []*Tag   `gorm:"many2many:tag_articles;"`
 	PermissionRequire int      `gorm:"default:1;"`
 }
@@ -28,7 +27,6 @@ type Article struct {
 const (
 	Table_Article_Title             = "title"
 	Table_Article_AuthorName        = "author_name"
-	Table_Article_ReplayCount       = "replay_count"
 	Table_Article_Context           = "context"
 	Table_Article_PermissionRequire = "permission_require"
 )
@@ -40,7 +38,7 @@ type Replay struct {
 	Author       User    `gorm:"foreignkey:AuthorName;"`
 	AuthorName   string  `gorm:"size:255;not null;index;"` //id
 	Context      string  `gorm:"size:2048;"`
-	Count        uint    `gorm:"not null;index;"`
+	IpAddress    string  `gorm:"size:255"`
 }
 
 const (
@@ -48,6 +46,7 @@ const (
 	Table_Replay_AuthorName   = "author_name"
 	Table_Replay_Context      = "context"
 	Table_Replay_Count        = "count"
+	Table_Replay_IpAddress    = "ip_address"
 )
 
 type Tag struct {

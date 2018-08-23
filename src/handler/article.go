@@ -15,6 +15,7 @@ func PostReplay(c *gin.Context) {
 	if err = c.Bind(&req); err != nil {
 		goto fail
 	}
+	req.IpAddress = c.ClientIP()
 	if err = service.PostReplay(&req); err != nil {
 		goto fail
 	}
@@ -48,14 +49,10 @@ func DelReplays(c *gin.Context) {
 	var req model.REQDelReplays
 	var err error
 
-	req.Title = c.Param("title")
-	req.Count = c.Param("count")
 	if req.CurrUser, err = getCurrUser(c); err != nil {
 		goto fail
 	}
-	if err = c.Bind(&req); err != nil {
-		goto fail
-	}
+	req.Rid = c.Param("rid")
 	if err = service.DelArticleReplay(&req); err != nil {
 		goto fail
 	}

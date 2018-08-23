@@ -1,7 +1,7 @@
 package service
 
 import (
-	"fmt"
+	"strings"
 	"time"
 	"utility"
 )
@@ -34,12 +34,6 @@ func parsrDate(s string) (time.Time, error) {
 func formatDatetime(time time.Time) string {
 	return utility.FormatDatetime(time)
 }
-func buildArgs(split string, args ...interface{}) string {
-	l := len(args)
-	v := args[l-1]
-	if l == 1 {
-		return fmt.Sprintf("%v", v)
-	} else {
-		return buildArgs(split, args[:len(args)-1]...) + fmt.Sprintf("%s%v", split, v)
-	}
+func buildArgs(split string, args ...string) string {
+	return strings.Join(args, split)
 }

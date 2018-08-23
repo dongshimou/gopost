@@ -23,10 +23,11 @@ type REQGetTags struct {
 	Title string `form :"title" url:"title"`
 }
 type REQNewReplay struct {
-	Aid      string `json:"aid" form:"aid"`
-	Title    string `json:"title" form:"title"`
-	Context  string `json:"context" form:"context"`
-	CurrUser *User
+	Aid       string `json:"aid" form:"aid"`
+	Title     string `json:"title" form:"title"`
+	Context   string `json:"context" form:"context"`
+	CurrUser  *User
+	IpAddress string
 }
 type REQGetReplays struct {
 	Title    string `form:"title" url:"title"`
@@ -34,8 +35,6 @@ type REQGetReplays struct {
 	CurrUser *User
 }
 type REQDelReplays struct {
-	Title    string
-	Count    string
 	Rid      string
 	CurrUser *User
 }

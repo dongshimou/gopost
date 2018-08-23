@@ -25,41 +25,43 @@ type RESGetArticle struct {
 	Author         string   `json:"author"`
 	Tags           []string `json:"tags"`
 	Context        string   `json:"context"`
-	ReplayCount    uint     `json:"replay_count"`
 	CreateDatetime string   `json:"create_datetime"`
 	EditDatetime   string   `json:"edit_datetime"`
 
 	Next string `json:"next"`
 	Prev string `json:"prev"`
 }
-
+type RESGetReplaysSingle struct {
+	Rid            uint   `json:"rid"`
+	Username       string `json:"username"`
+	IpAddress      string `json:"ip_address"`
+	Context        string `json:"context"`
+	CreateDatetime string `json:"create_datetime"`
+}
 type RESGetReplays struct {
-	Aid          uint   `json:"aid"`
-	ArticleTitle string `json:"article_title"`
-	Replays      []struct {
-		Rid            uint   `json:"rid"`
-		Username       string `json:"username"`
-		Context        string `json:"context"`
-		CreateDatetime string `json:"create_datetime"`
-	} `json:"replays"`
+	Aid          uint                  `json:"aid"`
+	ArticleTitle string                `json:"article_title"`
+	Replays      []RESGetReplaysSingle `json:"replays"`
 }
 
-type RESGetUserInfo struct {
-	Uid            uint   `json:"uid"`
-	Username       string `json:"username"`
-	Email          string `json:"email"`
-	Permission     int    `json:"permission"`
+type RESGetUserInfoArticle struct {
+	Title          string `json:"title"`
 	CreateDatetime string `json:"create_datetime"`
-	UpdateDatetime string `json:"update_datetime"`
-	PostArticle    []struct {
-		Title          string `json:"title"`
-		CreateDatetime string `json:"create_datetime"`
-	} `json:"post_article"`
-	PostReplay []struct {
-		Title          string `json:"title"`
-		Replay         string `json:"replay"`
-		CreateDatetime string `json:"create_datetime"`
-	} `json:"post_replay"`
+}
+type RESGetUserInfoReplay struct {
+	Title          string `json:"title"`
+	Replay         string `json:"replay"`
+	CreateDatetime string `json:"create_datetime"`
+}
+type RESGetUserInfo struct {
+	Uid            uint                    `json:"uid"`
+	Username       string                  `json:"username"`
+	Email          string                  `json:"email"`
+	Permission     int                     `json:"permission"`
+	CreateDatetime string                  `json:"create_datetime"`
+	UpdateDatetime string                  `json:"update_datetime"`
+	PostArticle    []RESGetUserInfoArticle `json:"post_article"`
+	PostReplay     []RESGetUserInfoReplay  `json:"post_replay"`
 }
 
 type RESGetTags struct {
