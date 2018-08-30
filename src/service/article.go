@@ -20,7 +20,7 @@ func CreateArticle(req *model.REQNewArticle) error {
 	db.Commit()
 	return nil
 }
-func createOrupdateArticle(tx *gorm.DB, req *model.REQNewArticle, create_update int) error {
+func createOrupdateArticle(tx *gorm.DB, req *model.REQNewArticle, oldTitle string) error {
 	tags := []*model.Tag{}
 	for i, _ := range req.Tags {
 		t := model.Tag{Name: req.Tags[i]}
@@ -35,14 +35,14 @@ func createOrupdateArticle(tx *gorm.DB, req *model.REQNewArticle, create_update 
 		Tags:       tags,
 		AuthorName: req.CurrUser.Name,
 	}
-	if create_update == 1 {
+	if oldTitle == "" {
 		if err := tx.Save(&post).Error; err != nil {
 			return err
 		}
 		logger.Debug("create", req.Title, "success")
 	} else {
 		art := model.Article{}
-		if err := tx.Model(&model.Article{}).Where(&model.Article{Title: req.Title}).Last(&art).Error; err != nil {
+		if err := tx.Model(&model.Article{}).Where(&model.Article{Title: oldTitle}).Last(&art).Error; err != nil {
 			return err
 		}
 		if err := tx.Model(&art).Update(&post).Error; err != nil {
@@ -52,9 +52,9 @@ func createOrupdateArticle(tx *gorm.DB, req *model.REQNewArticle, create_update 
 	}
 	return nil
 }
-func UpdateArticle(req *model.REQNewArticle) error {
+func UpdateArticle(req *model.REQUpdateArticle) error {
 	db := controller.GetDB().Begin()
-	if err := createOrupdateArticle(db, req, 2); err != nil {
+	if err := createOrupdateArticle(db, &req.REQNewArticle, req.OldTitle); err != nil {
 		db.Rollback()
 		return err
 	}

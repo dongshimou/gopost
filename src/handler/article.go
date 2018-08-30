@@ -135,7 +135,7 @@ fail:
 	DoResponseFail(c, err)
 }
 func UpdateArticle(c *gin.Context) {
-	var req model.REQNewArticle
+	var req model.REQUpdateArticle
 	var err error
 	if req.CurrUser, err = getCurrUser(c); err != nil {
 		goto fail
@@ -143,6 +143,7 @@ func UpdateArticle(c *gin.Context) {
 	if err = c.Bind(&req); err != nil {
 		goto fail
 	}
+	req.OldTitle = c.Param("oldtitle")
 	if err = service.UpdateArticle(&req); err != nil {
 		goto fail
 

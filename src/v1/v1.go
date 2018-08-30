@@ -84,7 +84,7 @@ var routes = []Route{
 	Route{
 		"UpdateArticle",
 		"POST",
-		pathVer + "/article/update/:title",
+		pathVer + "/article/update/:oldtitle",
 		handler.UpdateArticle,
 		MakeAuth(model.Article_Update),
 	},

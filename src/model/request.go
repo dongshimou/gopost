@@ -6,6 +6,10 @@ type REQNewArticle struct {
 	Context  string   `json:"context" binding:"required"`
 	CurrUser *User
 }
+type REQUpdateArticle struct {
+	REQNewArticle
+	OldTitle string
+}
 type REQGetArticles struct {
 	Time string `json:"time" form:"time" binding:"required"`
 	Size string `json:"size" form:"size" binding:"required"`
