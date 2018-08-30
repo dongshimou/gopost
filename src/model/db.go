@@ -45,7 +45,6 @@ const (
 	Table_Replay_ArticleTitle = "article_title"
 	Table_Replay_AuthorName   = "author_name"
 	Table_Replay_Context      = "context"
-	Table_Replay_Count        = "count"
 	Table_Replay_IpAddress    = "ip_address"
 )
 

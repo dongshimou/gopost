@@ -8,6 +8,7 @@ import (
 	"model"
 	"time"
 	"utility"
+	"strings"
 )
 
 func CreateArticle(req *model.REQNewArticle) error {
@@ -271,16 +272,17 @@ func GetArticleReplays(req *model.REQGetReplays) (*model.RESGetReplays, error) {
 	}
 
 	if err := db.Model(&article).
-		Select(buildArgs(",", model.DB_id,
-			model.Table_Replay_AuthorName,
-			model.Table_Replay_IpAddress,
-			model.Table_Replay_Context,
-			model.DB_created_at)).
-		Order(buildArgs(" ", model.Table_Replay_Count, model.DB_desc)).
+		Select(strings.Join([]string{
+				model.DB_id,
+				model.Table_Replay_AuthorName,
+				model.Table_Replay_IpAddress,
+				model.Table_Replay_Context,
+				model.DB_created_at,
+			},",")).
+		Order(strings.Join([]string{model.DB_created_at,model.DB_desc}," ")).
 		Related(&article.Replays, "Replays").Error; err != nil {
 		return nil, err
 	}
-
 	res := model.RESGetReplays{}
 	res.Aid = article.ID
 	res.ArticleTitle = article.Title
