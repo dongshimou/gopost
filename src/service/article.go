@@ -36,12 +36,14 @@ func createOrupdateArticle(tx *gorm.DB, req *model.REQNewArticle, oldTitle strin
 		AuthorName: req.CurrUser.Name,
 	}
 	if oldTitle == "" {
+		logger.Debug("create new ",req.Title)
 		if err := tx.Save(&post).Error; err != nil {
 			return err
 		}
 		logger.Debug("create", req.Title, "success")
 	} else {
 		art := model.Article{}
+		logger.Debug("update -> ",oldTitle)
 		if err := tx.Model(&model.Article{}).Where(&model.Article{Title: oldTitle}).Last(&art).Error; err != nil {
 			return err
 		}
