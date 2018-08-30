@@ -13,7 +13,7 @@ import (
 func CreateArticle(req *model.REQNewArticle) error {
 
 	db := controller.GetDB().Begin()
-	if err := createOrupdateArticle(db, req, 1); err != nil {
+	if err := createOrupdateArticle(db, req, ""); err != nil {
 		db.Rollback()
 		return err
 	}
