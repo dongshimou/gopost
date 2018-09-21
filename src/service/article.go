@@ -66,9 +66,15 @@ func UpdateArticle(req *model.REQUpdateArticle) error {
 }
 func GetStat(req *model.REQGetStat)(*model.RESGetStat,error){
 	res:=model.RESGetStat{}
-		if err:=controller.GetDB().Model(&model.Stat{}).
+
+	sql:=controller.GetDB().Model(&model.Stat{}).
 		Select("date,count(ip) as count").
-		Group("date").Having("date=?",req.Date).Scan(&res.List).
+		Group("date")
+
+		if req.Date!=""{
+			sql=sql.Having("date=?",req.Date)
+		}
+		if err:=sql.Scan(&res.List).
 		Error;err!=nil{
 			return nil,err
 		}
