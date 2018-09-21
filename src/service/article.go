@@ -64,6 +64,32 @@ func UpdateArticle(req *model.REQUpdateArticle) error {
 	db.Commit()
 	return nil
 }
+func GetStat(req *model.REQGetStat)(*model.RESGetStat,error){
+	res:=model.RESGetStat{}
+		if err:=controller.GetDB().Model(&model.Stat{}).
+		Select("date,count(ip) as count").
+		Group("date").Having("date=?",req.Date).Scan(&res.List).
+		Error;err!=nil{
+			return nil,err
+		}
+	return &res,nil
+}
+func StatIp(ip string)error{
+	db:=controller.GetDB()
+	date:=utility.FormatDate(time.Now())
+	stat:=model.Stat{}
+	stat.Date=date
+	stat.Ip=ip
+	count:=0
+	if err:=db.Model(&model.Stat{}).Where(&stat).Count(&count).Error;err!=nil{
+		return err
+	}
+	if count==0{
+		return db.Create(&stat).Error
+	}else{
+		return nil
+	}
+}
 func GetArticles(req *model.REQGetArticles) (*model.RESGetArticles, error) {
 
 	t1, errT1 := parseTime(req.Time)

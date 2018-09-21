@@ -26,6 +26,9 @@ type REQDelArticle struct {
 type REQGetTags struct {
 	Title string `form :"title" url:"title"`
 }
+type REQGetStat struct {
+	Date string `form:"date"`
+}
 type REQNewReplay struct {
 	Aid       string `json:"aid" form:"aid"`
 	Title     string `json:"title" form:"title"`

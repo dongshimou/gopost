@@ -2,7 +2,7 @@ package model
 
 import (
 	"github.com/jinzhu/gorm"
-)
+	)
 
 const (
 	DB_id         = "id"
@@ -66,6 +66,11 @@ type User struct {
 	SignUpIP   string    `gorm:"size:128"`
 }
 
+type Stat struct {
+	Id uint `gorm:"primary_key"`
+	Date string `gorm:"size:255"`
+	Ip string `gorm:"size:255"`
+}
 const (
 	Replay_Read   = 1
 	Replay_Create = 1 << 1

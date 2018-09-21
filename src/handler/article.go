@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"model"
 	"service"
+	"logger"
 )
 
 func PostReplay(c *gin.Context) {
@@ -95,6 +96,27 @@ func GetArticles(c *gin.Context) {
 	return
 fail:
 	DoResponseFail(c, err)
+}
+func StatIp(c *gin.Context){
+	ip:=c.ClientIP()
+	if err:=service.StatIp(ip);err!=nil{
+		logger.Error(err)
+	}
+}
+func GetStat(c *gin.Context){
+	var req model.REQGetStat
+	var res *model.RESGetStat
+	var err error
+	if err=c.Bind(&req);err!=nil{
+		goto fail
+	}
+	if res,err=service.GetStat(&req);err!=nil{
+		goto fail
+	}
+	DoResponseOK(c,res)
+	return
+fail:
+	DoResponseFail(c,err)
 }
 func GetArticle(c *gin.Context) {
 	var req model.REQGetArticle

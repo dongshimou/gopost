@@ -40,7 +40,13 @@ func InitDB() error {
 	}
 	db = db.Set("gorm:table_options", "ENGINE=InnoDB CHARSET=utf8 auto_increment=1")
 
-	db = db.AutoMigrate(&model.Article{}, &model.Replay{}, &model.User{}, &model.Tag{})
+	db = db.AutoMigrate(
+		&model.Article{},
+		&model.Replay{},
+		&model.User{},
+		&model.Tag{},
+		model.Stat{},
+	)
 	if logger.DEBUG {
 		db.LogMode(true)
 	}

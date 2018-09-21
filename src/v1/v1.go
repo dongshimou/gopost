@@ -68,11 +68,18 @@ func GetUserFromToken(token string) (*model.User, error) {
 
 var routes = []Route{
 	Route{
+		"GetIpStat",
+		"GET",
+		pathVer+"/stat",
+		handler.GetStat,
+		nil,
+	},
+	Route{
 		"GetAllArticle",
 		"GET",
 		pathVer + "/article",
 		handler.GetArticles,
-		MakeAuth(model.Article_Read),
+		append(MakeAuth(model.Article_Read),handler.StatIp),
 	},
 	Route{
 		"CreateArticle",
@@ -93,7 +100,7 @@ var routes = []Route{
 		"GET",
 		pathVer + "/article/:title",
 		handler.GetArticle,
-		MakeAuth(model.Article_Read),
+		append(MakeAuth(model.Article_Read),handler.StatIp),
 	},
 	Route{
 		"DelArticle",
