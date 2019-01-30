@@ -1,11 +1,15 @@
-package model
+package protocol
+
+import (
+	"model"
+)
 
 type REQNewArticle struct {
 	Title    string   `json:"title" binding:"required"`
 	Tags     []string `json:"tags"`
 	Context  string   `json:"context" binding:"required"`
 	SNS      string `json:"sns"`
-	CurrUser *User
+	CurrUser *model.User
 }
 type REQUpdateArticle struct {
 	REQNewArticle
@@ -18,11 +22,11 @@ type REQGetArticles struct {
 type REQGetArticle struct {
 	Title    string `form:"title" url:"title"`
 	Aid      string `form:"aid"`
-	CurrUser *User
+	CurrUser *model.User
 }
 type REQDelArticle struct {
 	Title    string `form:"title" url:"title"`
-	CurrUser *User
+	CurrUser *model.User
 }
 type REQGetTags struct {
 	Title string `form :"title" url:"title"`
@@ -34,22 +38,22 @@ type REQNewReplay struct {
 	Aid       string `json:"aid" form:"aid"`
 	Title     string `json:"title" form:"title"`
 	Context   string `json:"context" form:"context"`
-	CurrUser  *User
+	CurrUser  *model.User
 	IpAddress string
 }
 type REQGetReplays struct {
 	Title    string `form:"title" url:"title"`
 	Aid      string `form:"aid" `
-	CurrUser *User
+	CurrUser *model.User
 }
 type REQDelReplays struct {
 	Rid      string
-	CurrUser *User
+	CurrUser *model.User
 }
 type REQGetUserInfo struct {
 	Username string `form:"username" url:"username"`
 	Uid      string `form:"uid"`
-	CurrUser *User
+	CurrUser *model.User
 }
 
 type REQSignin struct {

@@ -6,12 +6,13 @@ import (
 	"github.com/jinzhu/gorm"
 	"logger"
 	"model"
+	"protocol"
 	"time"
 	"utility"
 	"strings"
 )
 
-func CreateArticle(req *model.REQNewArticle) error {
+func CreateArticle(req *protocol.REQNewArticle) error {
 
 	db := orm.Get().Begin()
 	if err := createOrupdateArticle(db, req, ""); err != nil {
@@ -35,7 +36,7 @@ func share2sns(snsList string)error{
 	}
 	return nil
 }
-func createOrupdateArticle(tx *gorm.DB, req *model.REQNewArticle, oldTitle string) error {
+func createOrupdateArticle(tx *gorm.DB, req *protocol.REQNewArticle, oldTitle string) error {
 	tags := []*model.Tag{}
 	for i, _ := range req.Tags {
 		t := model.Tag{Name: req.Tags[i]}
@@ -69,7 +70,7 @@ func createOrupdateArticle(tx *gorm.DB, req *model.REQNewArticle, oldTitle strin
 	}
 	return nil
 }
-func UpdateArticle(req *model.REQUpdateArticle) error {
+func UpdateArticle(req *protocol.REQUpdateArticle) error {
 	db := orm.Get().Begin()
 	if err := createOrupdateArticle(db, &req.REQNewArticle, req.OldTitle); err != nil {
 		db.Rollback()
@@ -78,8 +79,8 @@ func UpdateArticle(req *model.REQUpdateArticle) error {
 	db.Commit()
 	return nil
 }
-func GetStat(req *model.REQGetStat)(*model.RESGetStat,error){
-	res:=model.RESGetStat{}
+func GetStat(req *protocol.REQGetStat)(*protocol.RESGetStat,error){
+	res:=protocol.RESGetStat{}
 
 	sql:= orm.Get().Model(&model.Stat{}).
 		Select("date,count(ip) as count").
@@ -110,7 +111,7 @@ func StatIp(ip string)error{
 		return nil
 	}
 }
-func GetArticles(req *model.REQGetArticles) (*model.RESGetArticles, error) {
+func GetArticles(req *protocol.REQGetArticles) (*protocol.RESGetArticles, error) {
 
 	t1, errT1 := parseTime(req.Time)
 	t2, errT2 := parseUnix(req.Time)
@@ -149,10 +150,10 @@ func GetArticles(req *model.REQGetArticles) (*model.RESGetArticles, error) {
 		}
 	}
 
-	resData := make([]model.RESGetArticle, len(arts))
+	resData := make([]protocol.RESGetArticle, len(arts))
 	for i := 0; i < len(arts); i++ {
 		a := &arts[i]
-		resData[i] = model.RESGetArticle{
+		resData[i] = protocol.RESGetArticle{
 			a.ID,
 			a.Title,
 			a.AuthorName,
@@ -170,9 +171,9 @@ func GetArticles(req *model.REQGetArticles) (*model.RESGetArticles, error) {
 			"",
 		}
 	}
-	return &model.RESGetArticles{resData}, nil
+	return &protocol.RESGetArticles{resData}, nil
 }
-func GetArticle(req *model.REQGetArticle) (*model.RESGetArticle, error) {
+func GetArticle(req *protocol.REQGetArticle) (*protocol.RESGetArticle, error) {
 	article := model.Article{}
 	if !isNullOrEmpty(req.Aid) {
 		aid, err := parseID(req.Aid)
@@ -207,7 +208,7 @@ query:
 	//db.Model(&prev).Where("created_at < ?", article.CreatedAt).Select("title").Last(&prev)
 	db.Model(&next).Where("id > ?", article.ID).Select("title").First(&next)
 	//db.Model(&next).Where("created_at > ?", article.CreatedAt).Select("title").First(&next)
-	res := model.RESGetArticle{
+	res := protocol.RESGetArticle{
 		Aid:    article.ID,
 		Title:  article.Title,
 		Author: article.AuthorName,
@@ -226,7 +227,7 @@ query:
 	}
 	return &res, nil
 }
-func DelArticle(req *model.REQDelArticle) (err error) {
+func DelArticle(req *protocol.REQDelArticle) (err error) {
 
 	article := model.Article{}
 	article.Title = req.Title
@@ -238,7 +239,7 @@ func DelArticle(req *model.REQDelArticle) (err error) {
 	tx.Commit()
 	return nil
 }
-func GetTags(req *model.REQGetTags) (*model.RESGetTags, error) {
+func GetTags(req *protocol.REQGetTags) (*protocol.RESGetTags, error) {
 
 	db := orm.Get()
 	art := model.Article{Title: req.Title}
@@ -249,26 +250,26 @@ func GetTags(req *model.REQGetTags) (*model.RESGetTags, error) {
 		Select("name").Related(&art.Tags, "tags").Error; err != nil {
 		return nil, err
 	}
-	res := model.RESGetTags{}
+	res := protocol.RESGetTags{}
 	for _, v := range art.Tags {
 		res.Names = append(res.Names, v.Name)
 	}
 	return &res, nil
 }
-func GetAllTags() (*model.RESGetTags, error) {
+func GetAllTags() (*protocol.RESGetTags, error) {
 	db := orm.Get()
 
 	tags := []model.Tag{}
 	if err := db.Model(&model.Tag{}).Select("name").Find(&tags).Error; err != nil {
 		return nil, err
 	}
-	res := model.RESGetTags{}
+	res := protocol.RESGetTags{}
 	for _, v := range tags {
 		res.Names = append(res.Names, v.Name)
 	}
 	return &res, nil
 }
-func PostReplay(req *model.REQNewReplay) (err error) {
+func PostReplay(req *protocol.REQNewReplay) (err error) {
 	if isNullOrEmpty(req.Title) || isNullOrEmpty(req.Context) {
 		return utility.NewError(utility.ERROR_REQUEST_CODE, utility.ERROR_REQUEST_MSG)
 	}
@@ -306,7 +307,7 @@ func PostReplay(req *model.REQNewReplay) (err error) {
 	tx.Commit()
 	return nil
 }
-func GetArticleReplays(req *model.REQGetReplays) (*model.RESGetReplays, error) {
+func GetArticleReplays(req *protocol.REQGetReplays) (*protocol.RESGetReplays, error) {
 
 	article := &model.Article{
 		Title: req.Title,
@@ -329,13 +330,13 @@ func GetArticleReplays(req *model.REQGetReplays) (*model.RESGetReplays, error) {
 		Related(&article.Replays, "Replays").Error; err != nil {
 		return nil, err
 	}
-	res := model.RESGetReplays{}
+	res := protocol.RESGetReplays{}
 	res.Aid = article.ID
 	res.ArticleTitle = article.Title
 
 	for i, _ := range article.Replays {
 		v := &article.Replays[i]
-		res.Replays = append(res.Replays, model.RESGetReplaysSingle{
+		res.Replays = append(res.Replays, protocol.RESGetReplaysSingle{
 			Rid:            v.ID,
 			Username:       v.AuthorName,
 			Context:        v.Context,
@@ -345,7 +346,7 @@ func GetArticleReplays(req *model.REQGetReplays) (*model.RESGetReplays, error) {
 	}
 	return &res, nil
 }
-func DelArticleReplay(req *model.REQDelReplays) (err error) {
+func DelArticleReplay(req *protocol.REQDelReplays) (err error) {
 	replay := model.Replay{}
 
 	if !isNullOrEmpty(req.Rid) {
@@ -365,7 +366,7 @@ func DelArticleReplay(req *model.REQDelReplays) (err error) {
 	tx.Commit()
 	return nil
 }
-func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
+func GetUserInfo(req *protocol.REQGetUserInfo) (*protocol.RESGetUserInfo, error) {
 	var err error
 	if isNullOrEmpty(req.Uid) && isNullOrEmpty(req.Username) {
 		return nil, utility.NewError(utility.ERROR_REQUEST_CODE, utility.ERROR_REQUEST_MSG)
@@ -401,12 +402,12 @@ func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
 		return nil, err
 	}
 
-	res := model.RESGetUserInfo{}
+	res := protocol.RESGetUserInfo{}
 
 	for i, _ := range quser.Articles {
 		v := &quser.Articles[i]
 
-		res.PostArticle = append(res.PostArticle, model.RESGetUserInfoArticle{
+		res.PostArticle = append(res.PostArticle, protocol.RESGetUserInfoArticle{
 			Title:          v.Title,
 			CreateDatetime: formatDatetime(v.CreatedAt),
 		})
@@ -415,7 +416,7 @@ func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
 	for i, _ := range quser.Replays {
 		v := &quser.Replays[i]
 
-		res.PostReplay = append(res.PostReplay, model.RESGetUserInfoReplay{
+		res.PostReplay = append(res.PostReplay, protocol.RESGetUserInfoReplay{
 			Title:          v.ArticleTitle,
 			Replay:         v.Context,
 			CreateDatetime: formatDatetime(v.CreatedAt),

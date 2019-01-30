@@ -2,12 +2,12 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"model"
+	"protocol"
 	"service"
 )
 
 func NewMood(c *gin.Context){
-	var req model.REQNewMood
+	var req protocol.REQNewMood
 	var err error
 
 	defer func() {
@@ -27,8 +27,8 @@ func NewMood(c *gin.Context){
 }
 
 func LastMood(c *gin.Context){
-	var req model.REQLastMood
-	var res *model.RESLastMood
+	var req protocol.REQLastMood
+	var res *protocol.RESLastMood
 	var err error
 	defer func() {
 		if err!=nil{

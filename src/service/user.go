@@ -3,10 +3,11 @@ package service
 import (
 	"model"
 	"orm"
+	"protocol"
 	"utility"
 )
 
-func SignIn(req *model.REQSignin) (*model.RESSignIn, error) {
+func SignIn(req *protocol.REQSignin) (*protocol.RESSignIn, error) {
 	var err error
 	user := model.User{}
 	//验证 req.Username
@@ -29,7 +30,7 @@ func SignIn(req *model.REQSignin) (*model.RESSignIn, error) {
 	if err = db.Model(&user).Where(model.User{Name: user.Name}).Update(user).Error; err != nil {
 		return nil, err
 	}
-	res := model.RESSignIn{}
+	res := protocol.RESSignIn{}
 	res.Username = user.Name
 	res.Permission = user.Permission
 	res.UpdateDatetime = formatDatetime(user.UpdatedAt)
@@ -39,7 +40,7 @@ func SignIn(req *model.REQSignin) (*model.RESSignIn, error) {
 	}
 	return &res, nil
 }
-func SignUp(req *model.REQSignUp) (*model.RESSignUp, error) {
+func SignUp(req *protocol.REQSignUp) (*protocol.RESSignUp, error) {
 	var err error
 	user := model.User{}
 	//验证 req.Username

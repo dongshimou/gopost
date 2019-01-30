@@ -6,6 +6,7 @@ import (
 	"logger"
 	"model"
 	"net/http"
+	"protocol"
 	"utility"
 )
 
@@ -13,7 +14,7 @@ func doFail(c *gin.Context, code int, msg string) {
 	if code < utility.ERROR_OK_CODE {
 		c.String(code, msg)
 	} else {
-		res := model.Response{
+		res := protocol.Response{
 			Code: code,
 			Msg:  msg,
 			Data: nil,
@@ -33,13 +34,13 @@ func DoResponseOK(c *gin.Context, data interface{}) {
 	var res interface{}
 	//组装JSON返回数据
 	if data != nil {
-		res = model.Response{
+		res = protocol.Response{
 			Code: utility.ERROR_OK_CODE,
 			Msg:  utility.ERROR_OK_MSG,
 			Data: data,
 		}
 	} else {
-		res = model.Response{
+		res = protocol.Response{
 			Code: utility.ERROR_OK_CODE,
 			Msg:  utility.ERROR_OK_MSG,
 			Data: nil,

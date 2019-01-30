@@ -45,7 +45,8 @@ func InitDB() error {
 		&model.Replay{},
 		&model.User{},
 		&model.Tag{},
-		model.Stat{},
+		&model.Stat{},
+		&model.Mood{},
 	)
 	if logger.DEBUG {
 		db.LogMode(true)

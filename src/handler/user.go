@@ -2,13 +2,13 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"model"
+	"protocol"
 	"service"
 )
 
 func SignIn(c *gin.Context) {
-	var req model.REQSignin
-	var res *model.RESSignIn
+	var req protocol.REQSignin
+	var res *protocol.RESSignIn
 	var err error
 
 	req.IP = c.ClientIP()
@@ -43,8 +43,8 @@ func SignVerify(c *gin.Context) {
 
 func SignUp(c *gin.Context) {
 
-	var req model.REQSignUp
-	var res *model.RESSignUp
+	var req protocol.REQSignUp
+	var res *protocol.RESSignUp
 	var err error
 
 	req.IP = c.ClientIP()

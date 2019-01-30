@@ -1,4 +1,8 @@
-package model
+package protocol
+
+import (
+	"model"
+)
 
 type Response struct {
 	Code int         `json:"code"`
@@ -76,5 +80,5 @@ type RESGetStat struct {
 }
 
 type RESLastMood struct {
-	List []Mood `json:"list"`
+	List []model.Mood `json:"list"`
 }

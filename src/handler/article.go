@@ -2,13 +2,13 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"model"
-	"service"
 	"logger"
+	"protocol"
+	"service"
 )
 
 func PostReplay(c *gin.Context) {
-	var req model.REQNewReplay
+	var req protocol.REQNewReplay
 	var err error
 	if req.CurrUser, err = getCurrUser(c); err != nil {
 		goto fail
@@ -27,8 +27,8 @@ fail:
 	DoResponseFail(c, err)
 }
 func GetReplays(c *gin.Context) {
-	var req model.REQGetReplays
-	var res *model.RESGetReplays
+	var req protocol.REQGetReplays
+	var res *protocol.RESGetReplays
 	var err error
 	req.Title = c.Param("title")
 	if req.CurrUser, err = getCurrUser(c); err != nil {
@@ -47,7 +47,7 @@ fail:
 	DoResponseFail(c, err)
 }
 func DelReplays(c *gin.Context) {
-	var req model.REQDelReplays
+	var req protocol.REQDelReplays
 	var err error
 
 	if req.CurrUser, err = getCurrUser(c); err != nil {
@@ -63,8 +63,8 @@ fail:
 	DoResponseFail(c, err)
 }
 func GetUserInfo(c *gin.Context) {
-	var req model.REQGetUserInfo
-	var res *model.RESGetUserInfo
+	var req protocol.REQGetUserInfo
+	var res *protocol.RESGetUserInfo
 	var err error
 	req.Username = c.Param("username")
 	if req.CurrUser, err = getCurrUser(c); err != nil {
@@ -83,8 +83,8 @@ fail:
 	DoResponseFail(c, err)
 }
 func GetArticles(c *gin.Context) {
-	var req model.REQGetArticles
-	var res *model.RESGetArticles
+	var req protocol.REQGetArticles
+	var res *protocol.RESGetArticles
 	var err error
 	if err = c.Bind(&req); err != nil {
 		goto fail
@@ -104,8 +104,8 @@ func StatIp(c *gin.Context){
 	}
 }
 func GetStat(c *gin.Context){
-	var req model.REQGetStat
-	var res *model.RESGetStat
+	var req protocol.REQGetStat
+	var res *protocol.RESGetStat
 	var err error
 	if err=c.Bind(&req);err!=nil{
 		goto fail
@@ -119,8 +119,8 @@ fail:
 	DoResponseFail(c,err)
 }
 func GetArticle(c *gin.Context) {
-	var req model.REQGetArticle
-	var res *model.RESGetArticle
+	var req protocol.REQGetArticle
+	var res *protocol.RESGetArticle
 	var err error
 	req.Title = c.Param("title")
 	// 等待 gin 的bind url 功能
@@ -139,7 +139,7 @@ fail:
 	DoResponseFail(c, err)
 }
 func CreateArticle(c *gin.Context) {
-	var req model.REQNewArticle
+	var req protocol.REQNewArticle
 	var err error
 	if req.CurrUser, err = getCurrUser(c); err != nil {
 		goto fail
@@ -157,7 +157,7 @@ fail:
 	DoResponseFail(c, err)
 }
 func UpdateArticle(c *gin.Context) {
-	var req model.REQUpdateArticle
+	var req protocol.REQUpdateArticle
 	var err error
 	if req.CurrUser, err = getCurrUser(c); err != nil {
 		goto fail
@@ -176,7 +176,7 @@ fail:
 	DoResponseFail(c, err)
 }
 func DelArticle(c *gin.Context) {
-	var req model.REQDelArticle
+	var req protocol.REQDelArticle
 	var err error
 	if req.CurrUser, err = getCurrUser(c); err != nil {
 		goto fail
@@ -194,10 +194,10 @@ fail:
 	DoResponseFail(c, err)
 }
 func GetTags(c *gin.Context) {
-	var res *model.RESGetTags
+	var res *protocol.RESGetTags
 	var err error
-	if res, err = func() (*model.RESGetTags, error) {
-		var req model.REQGetTags
+	if res, err = func() (*protocol.RESGetTags, error) {
+		var req protocol.REQGetTags
 		req.Title = c.Param("title")
 		if err := c.Bind(&req); err != nil {
 			return nil, err
