@@ -19,6 +19,20 @@ func CreateArticle(req *model.REQNewArticle) error {
 		return err
 	}
 	db.Commit()
+	share2sns(req.SNS)
+	return nil
+}
+
+func share2sns(snsList string)error{
+	slist:=strings.Split(snsList,",")
+	for _,sns:=range slist{
+		switch sns {
+		case "twitter":
+
+		default:
+			logger.Debug("not support method!")
+		}
+	}
 	return nil
 }
 func createOrupdateArticle(tx *gorm.DB, req *model.REQNewArticle, oldTitle string) error {

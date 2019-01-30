@@ -4,6 +4,7 @@ type REQNewArticle struct {
 	Title    string   `json:"title" binding:"required"`
 	Tags     []string `json:"tags"`
 	Context  string   `json:"context" binding:"required"`
+	SNS      string `json:"sns"`
 	CurrUser *User
 }
 type REQUpdateArticle struct {
