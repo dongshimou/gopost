@@ -62,3 +62,10 @@ type REQSignUp struct {
 	REQSignin
 	Email string `json:"email" form:"email" binding:"required,email"`
 }
+
+type REQNewMood struct {
+	Context string `form:"context" json:"context"`
+}
+type REQLastMood struct {
+	Limit int `form:"limit"`
+}

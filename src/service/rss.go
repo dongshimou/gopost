@@ -2,9 +2,9 @@ package service
 
 import (
 	"base"
-	"controller"
 	"github.com/gorilla/feeds"
 	"model"
+	"orm"
 	"time"
 )
 
@@ -23,7 +23,7 @@ func Rss() (xml interface{}, err error) {
 		Created:     now,
 	}
 
-	db := controller.GetDB()
+	db := orm.Get()
 
 	articles := []model.Article{}
 

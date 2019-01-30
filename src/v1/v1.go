@@ -2,11 +2,11 @@ package v1
 
 import (
 	. "base"
-	"controller"
 	"github.com/gin-gonic/gin"
 	"handler"
 	"logger"
 	"model"
+	"orm"
 	"utility"
 )
 
@@ -15,13 +15,13 @@ const (
 )
 
 func InitV1() error {
-	err := controller.InitDB()
+	err := orm.InitDB()
 	if err != nil {
 		return err
 	}
 	scfg := GetConfig().Server
 	if logger.DEBUG {
-		controller.GetDB().Create(&model.User{
+		orm.Get().Create(&model.User{
 			Name:     scfg.Name,
 			Password: utility.EncryptPassword(scfg.Pass),
 			Permission: utility.CreatePermission(
@@ -59,7 +59,7 @@ func GetUserFromToken(token string) (*model.User, error) {
 			return nil, err
 		}
 	}
-	db := controller.GetDB()
+	db := orm.Get()
 	if err = db.Model(user).Where(user).First(user).Error; err != nil {
 		return nil, err
 	}
@@ -73,6 +73,20 @@ var routes = []Route{
 		pathVer+"/stat",
 		handler.GetStat,
 		nil,
+	},
+	Route{
+	"CreateMood",
+	"GET,POST",
+	pathVer+"/mood/new",
+	handler.NewMood,
+	nil,
+	},
+	Route{
+	"GetMoodLast",
+	"GET",
+	pathVer+"/mood/last",
+	handler.LastMood,
+	nil,
 	},
 	Route{
 		"GetAllArticle",

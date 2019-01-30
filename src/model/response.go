@@ -74,3 +74,7 @@ type ResGetStatSingle struct {
 type RESGetStat struct {
 	List []ResGetStatSingle `json:"list"`
 }
+
+type RESLastMood struct {
+	List []Mood `json:"list"`
+}

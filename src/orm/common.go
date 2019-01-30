@@ -1,4 +1,4 @@
-package controller
+package orm
 
 import (
 	"base"
@@ -15,7 +15,7 @@ var (
 	db *gorm.DB
 )
 
-func GetDB() *gorm.DB {
+func Get() *gorm.DB {
 	return db
 }
 func InitDB() error {

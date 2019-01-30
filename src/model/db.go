@@ -13,6 +13,11 @@ const (
 	DB_desc       = "desc"
 )
 
+type Mood struct {
+	gorm.Model
+	Context string `gorm:"size:255" json:"context"`
+}
+
 type Article struct {
 	gorm.Model
 	Title             string   `gorm:"size:255;not null;unique;"`

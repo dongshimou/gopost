@@ -1,8 +1,8 @@
 package service
 
 import (
-	"controller"
 	"model"
+	"orm"
 	"utility"
 )
 
@@ -17,7 +17,7 @@ func SignIn(req *model.REQSignin) (*model.RESSignIn, error) {
 	pass := utility.EncryptPassword(req.Password)
 
 	user.Name = req.Username
-	db := controller.GetDB()
+	db := orm.Get()
 
 	if err = db.Model(&user).Where(&user).First(&user).Error; err != nil {
 		return nil, err
@@ -60,7 +60,7 @@ func SignUp(req *model.REQSignUp) (*model.RESSignUp, error) {
 		model.Replay_Create,
 		model.Replay_Update,
 	)
-	db := controller.GetDB()
+	db := orm.Get()
 
 	count := 0
 	if err = db.Model(&user).Where(&user).Count(&count).Error; err != nil {

@@ -3,6 +3,7 @@ package base
 import (
 	"github.com/gin-gonic/gin"
 	"logger"
+	"strings"
 )
 
 type Route struct {
@@ -37,14 +38,16 @@ func StartService() {
 			hanlders = append(hanlders, route.AuthHandler...)
 		}
 		hanlders = append(hanlders, route.HandlerFunc)
-
-		switch route.Method {
-		case "GET":
-			router.GET(pattern, hanlders...)
-		case "POST":
-			router.POST(pattern, hanlders...)
-		case "DELETE":
-			router.DELETE(pattern, hanlders...)
+		methods:=strings.Split(route.Method,",")
+		for _,me:=range methods {
+			switch strings.ToUpper(me) {
+			case "GET":
+				router.GET(pattern, hanlders...)
+			case "POST":
+				router.POST(pattern, hanlders...)
+			case "DELETE":
+				router.DELETE(pattern, hanlders...)
+			}
 		}
 	}
 	address := ":" + GetConfig().Server.Port

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"controller"
+	"orm"
 	"errors"
 	"github.com/jinzhu/gorm"
 	"logger"
@@ -13,7 +13,7 @@ import (
 
 func CreateArticle(req *model.REQNewArticle) error {
 
-	db := controller.GetDB().Begin()
+	db := orm.Get().Begin()
 	if err := createOrupdateArticle(db, req, ""); err != nil {
 		db.Rollback()
 		return err
@@ -70,7 +70,7 @@ func createOrupdateArticle(tx *gorm.DB, req *model.REQNewArticle, oldTitle strin
 	return nil
 }
 func UpdateArticle(req *model.REQUpdateArticle) error {
-	db := controller.GetDB().Begin()
+	db := orm.Get().Begin()
 	if err := createOrupdateArticle(db, &req.REQNewArticle, req.OldTitle); err != nil {
 		db.Rollback()
 		return err
@@ -81,7 +81,7 @@ func UpdateArticle(req *model.REQUpdateArticle) error {
 func GetStat(req *model.REQGetStat)(*model.RESGetStat,error){
 	res:=model.RESGetStat{}
 
-	sql:=controller.GetDB().Model(&model.Stat{}).
+	sql:= orm.Get().Model(&model.Stat{}).
 		Select("date,count(ip) as count").
 		Group("date")
 
@@ -95,7 +95,7 @@ func GetStat(req *model.REQGetStat)(*model.RESGetStat,error){
 	return &res,nil
 }
 func StatIp(ip string)error{
-	db:=controller.GetDB()
+	db:= orm.Get()
 	date:=utility.FormatDate(time.Now())
 	stat:=model.Stat{}
 	stat.Date=date
@@ -133,7 +133,7 @@ func GetArticles(req *model.REQGetArticles) (*model.RESGetArticles, error) {
 	}
 	arts := []model.Article{}
 
-	db := controller.GetDB()
+	db := orm.Get()
 	if err = db.Model(&model.Article{}).
 		Where("created_at < ?", befor).
 		Order("created_at desc").
@@ -189,7 +189,7 @@ func GetArticle(req *model.REQGetArticle) (*model.RESGetArticle, error) {
 	return nil, utility.NewError(utility.ERROR_REQUEST_CODE, utility.ERROR_REQUEST_MSG)
 
 query:
-	db := controller.GetDB()
+	db := orm.Get()
 	//查询post
 	if err := db.Where(&article).First(&article).Error; err != nil {
 		return nil, err
@@ -230,7 +230,7 @@ func DelArticle(req *model.REQDelArticle) (err error) {
 
 	article := model.Article{}
 	article.Title = req.Title
-	tx := controller.GetDB().Begin()
+	tx := orm.Get().Begin()
 	if err = tx.Model(&article).Where(&article).Delete(&article).Error; err != nil {
 		tx.Rollback()
 		return err
@@ -240,7 +240,7 @@ func DelArticle(req *model.REQDelArticle) (err error) {
 }
 func GetTags(req *model.REQGetTags) (*model.RESGetTags, error) {
 
-	db := controller.GetDB()
+	db := orm.Get()
 	art := model.Article{Title: req.Title}
 	if err := db.Model(&model.Article{}).Where(&art).Last(&art).Error; err != nil {
 		return nil, err
@@ -256,7 +256,7 @@ func GetTags(req *model.REQGetTags) (*model.RESGetTags, error) {
 	return &res, nil
 }
 func GetAllTags() (*model.RESGetTags, error) {
-	db := controller.GetDB()
+	db := orm.Get()
 
 	tags := []model.Tag{}
 	if err := db.Model(&model.Tag{}).Select("name").Find(&tags).Error; err != nil {
@@ -284,7 +284,7 @@ func PostReplay(req *model.REQNewReplay) (err error) {
 	user := req.CurrUser
 	article.Title = req.Title
 
-	db := controller.GetDB()
+	db := orm.Get()
 	logger.Print(buildArgs(",", model.DB_id, model.Table_Article_Title))
 	if err = db.Model(&article).
 		Where(&article).
@@ -311,7 +311,7 @@ func GetArticleReplays(req *model.REQGetReplays) (*model.RESGetReplays, error) {
 	article := &model.Article{
 		Title: req.Title,
 	}
-	db := controller.GetDB()
+	db := orm.Get()
 	if err := db.Model(&article).Select(model.Table_Article_Title).
 		Where(&article).First(&article).Error; err != nil {
 		return nil, err
@@ -357,7 +357,7 @@ func DelArticleReplay(req *model.REQDelReplays) (err error) {
 	} else {
 		return errors.New("it's not a rid")
 	}
-	tx := controller.GetDB().Begin()
+	tx := orm.Get().Begin()
 	if err = tx.Model(&model.Replay{}).Where(&replay).Delete(&replay).Error; err != nil {
 		tx.Rollback()
 		return err
@@ -381,7 +381,7 @@ func GetUserInfo(req *model.REQGetUserInfo) (*model.RESGetUserInfo, error) {
 	}
 	quser.Name = req.Username
 
-	db := controller.GetDB()
+	db := orm.Get()
 
 	if err = db.Model(&quser).Where(&quser).First(&quser).Error; err != nil {
 		return nil, err
