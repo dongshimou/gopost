@@ -68,7 +68,7 @@ type REQSignUp struct {
 }
 
 type REQNewMood struct {
-	Context string `form:"context" json:"context"`
+	Context string `form:"context" json:"context" binding:"required"`
 }
 type REQLastMood struct {
 	Limit int `form:"limit"`
