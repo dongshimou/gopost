@@ -82,11 +82,12 @@ func UpdateArticle(req *protocol.REQUpdateArticle) error {
 func GetStat(req *protocol.REQGetStat)(*protocol.RESGetStat,error){
 	res:=protocol.RESGetStat{}
 
+	//倒序统计ip
 	sql:= orm.Get().Model(&model.Stat{}).
 		Select("date,count(ip) as count").
-		Group("date")
+		Group("date")	.Order("date desc")
 
-		if req.Date!=""{
+	if req.Date!=""{
 			sql=sql.Having("date=?",req.Date)
 		}
 		if err:=sql.Scan(&res.List).

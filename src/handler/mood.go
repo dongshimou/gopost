@@ -41,7 +41,7 @@ func LastMood(c *gin.Context){
 		return
 	}
 	if req.Limit==0{
-		req.Limit=20
+		req.Limit=10
 	}
 	if res,err=service.LastMood(&req);err!=nil{
 		return
