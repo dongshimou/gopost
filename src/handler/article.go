@@ -8,210 +8,221 @@ import (
 )
 
 func PostReplay(c *gin.Context) {
-	var req protocol.REQNewReplay
-	var err error
+	var (
+		req protocol.REQNewReplay
+		err error
+	)
+	defer func() {
+		doResponse(c, err)
+	}()
 	if req.CurrUser, err = getCurrUser(c); err != nil {
-		goto fail
+		return
 	}
 	if err = c.Bind(&req); err != nil {
-		goto fail
+		return
 	}
 	req.IpAddress = c.ClientIP()
 	if err = service.PostReplay(&req); err != nil {
-		goto fail
+		return
 	}
-	DoResponseOK(c, nil)
-	return
-
-fail:
-	DoResponseFail(c, err)
 }
 func GetReplays(c *gin.Context) {
-	var req protocol.REQGetReplays
-	var res *protocol.RESGetReplays
-	var err error
+	var (
+		req protocol.REQGetReplays
+		res interface{}
+		err error
+	)
+	defer func() {
+		doResponse(c, err, res)
+	}()
 	req.Title = c.Param("title")
 	if req.CurrUser, err = getCurrUser(c); err != nil {
-		goto fail
+		return
 	}
 	if err = c.Bind(&req); err != nil {
-		goto fail
+		return
 	}
 	if res, err = service.GetArticleReplays(&req); err != nil {
-		goto fail
+		return
 	}
-	DoResponseOK(c, res)
-	return
-
-fail:
-	DoResponseFail(c, err)
 }
 func DelReplays(c *gin.Context) {
-	var req protocol.REQDelReplays
-	var err error
-
+	var (
+		req protocol.REQDelReplays
+		err error
+	)
+	defer func() {
+		doResponse(c, err)
+	}()
 	if req.CurrUser, err = getCurrUser(c); err != nil {
-		goto fail
+		return
 	}
 	req.Rid = c.Param("rid")
 	if err = service.DelArticleReplay(&req); err != nil {
-		goto fail
+		return
 	}
-	DoResponseOK(c, nil)
-	return
-fail:
-	DoResponseFail(c, err)
 }
 func GetUserInfo(c *gin.Context) {
-	var req protocol.REQGetUserInfo
-	var res *protocol.RESGetUserInfo
-	var err error
+	var (
+		req protocol.REQGetUserInfo
+		res interface{}
+		err error
+	)
+	defer func() {
+		doResponse(c, err, res)
+	}()
 	req.Username = c.Param("username")
 	if req.CurrUser, err = getCurrUser(c); err != nil {
-		goto fail
+		return
 	}
 	if err = c.Bind(&req); err != nil {
-		goto fail
+		return
 	}
 	if res, err = service.GetUserInfo(&req); err != nil {
-		goto fail
+		return
 	}
-	DoResponseOK(c, res)
-	return
-
-fail:
-	DoResponseFail(c, err)
 }
 func GetArticles(c *gin.Context) {
-	var req protocol.REQGetArticles
-	var res *protocol.RESGetArticles
-	var err error
+	var (
+		req protocol.REQGetArticles
+		res interface{}
+		err error
+	)
+	defer func() {
+		doResponse(c, err, res)
+	}()
 	if err = c.Bind(&req); err != nil {
-		goto fail
+		return
 	}
 	if res, err = service.GetArticles(&req); err != nil {
-		goto fail
+		return
 	}
-	DoResponseOK(c, res)
-	return
-fail:
-	DoResponseFail(c, err)
 }
-func StatIp(c *gin.Context){
-	ip:=c.ClientIP()
-	if err:=service.StatIp(ip);err!=nil{
+func StatIp(c *gin.Context) {
+	ip := c.ClientIP()
+	if err := service.StatIp(ip); err != nil {
 		logger.Error(err)
 	}
 }
-func GetStat(c *gin.Context){
-	var req protocol.REQGetStat
-	var res *protocol.RESGetStat
-	var err error
-	if err=c.Bind(&req);err!=nil{
-		goto fail
+func GetStat(c *gin.Context) {
+	var (
+		req protocol.REQGetStat
+		res interface{}
+		err error
+	)
+	defer func() {
+		doResponse(c, err, res)
+	}()
+	if err = c.Bind(&req); err != nil {
+		return
 	}
-	if res,err=service.GetStat(&req);err!=nil{
-		goto fail
+	if res, err = service.GetStat(&req); err != nil {
+		return
 	}
-	DoResponseOK(c,res)
-	return
-fail:
-	DoResponseFail(c,err)
 }
 func GetArticle(c *gin.Context) {
-	var req protocol.REQGetArticle
-	var res *protocol.RESGetArticle
-	var err error
+	var (
+		req protocol.REQGetArticle
+		res interface{}
+		err error
+	)
+	defer func() {
+		doResponse(c, err, res)
+	}()
 	req.Title = c.Param("title")
 	// 等待 gin 的bind url 功能
 	if req.CurrUser, err = getCurrUser(c); err != nil {
-		goto fail
+		return
 	}
 	if err = c.Bind(&req); err != nil {
-		goto fail
+		return
 	}
 	if res, err = service.GetArticle(&req); err != nil {
-		goto fail
+		return
 	}
-	DoResponseOK(c, res)
-	return
-fail:
-	DoResponseFail(c, err)
 }
 func CreateArticle(c *gin.Context) {
-	var req protocol.REQNewArticle
-	var err error
+	var (
+		req protocol.REQNewArticle
+		err error
+	)
+	defer func() {
+		doResponse(c, err)
+	}()
 	if req.CurrUser, err = getCurrUser(c); err != nil {
-		goto fail
+		return
 	}
 	if err = c.Bind(&req); err != nil {
-		goto fail
+		return
 	}
 	if err = service.CreateArticle(&req); err != nil {
-		goto fail
-
+		return
 	}
-	DoResponseOK(c, nil)
-	return
-fail:
-	DoResponseFail(c, err)
 }
 func UpdateArticle(c *gin.Context) {
-	var req protocol.REQUpdateArticle
-	var err error
+	var (
+		req protocol.REQUpdateArticle
+		err error
+	)
+	defer func() {
+		doResponse(c, err)
+	}()
 	if req.CurrUser, err = getCurrUser(c); err != nil {
-		goto fail
+		return
 	}
 	if err = c.Bind(&req); err != nil {
-		goto fail
+		return
 	}
 	req.OldTitle = c.Param("oldtitle")
 	if err = service.UpdateArticle(&req); err != nil {
-		goto fail
-
+		return
 	}
-	DoResponseOK(c, nil)
-	return
-fail:
-	DoResponseFail(c, err)
 }
 func DelArticle(c *gin.Context) {
-	var req protocol.REQDelArticle
-	var err error
+	var (
+		req protocol.REQDelArticle
+		err error
+	)
+	defer func() {
+		doResponse(c, err)
+	}()
 	if req.CurrUser, err = getCurrUser(c); err != nil {
-		goto fail
+		return
 	}
 	req.Title = c.Param("title")
 	if err = c.Bind(&req); err != nil {
-		goto fail
+		return
 	}
 	if err = service.DelArticle(&req); err != nil {
-		goto fail
+		return
 	}
-	DoResponseOK(c, nil)
-	return
-fail:
-	DoResponseFail(c, err)
 }
 func GetTags(c *gin.Context) {
-	var res *protocol.RESGetTags
-	var err error
-	if res, err = func() (*protocol.RESGetTags, error) {
-		var req protocol.REQGetTags
-		req.Title = c.Param("title")
-		if err := c.Bind(&req); err != nil {
-			return nil, err
-		}
-		return service.GetTags(&req)
-	}(); err != nil {
-		DoResponseFail(c, err)
+	var (
+		req protocol.REQGetTags
+		res interface{}
+		err error
+	)
+	defer func() {
+		doResponse(c, err, res)
+	}()
+	req.Title = c.Param("title")
+	if err = c.Bind(&req); err != nil {
+		return
 	}
-	DoResponseOK(c, res)
+	if res, err = service.GetTags(&req); err != nil {
+		return
+	}
 }
 func GetAllTags(c *gin.Context) {
-	res, err := service.GetAllTags()
-	if err != nil {
-		DoResponseFail(c, err)
+	var (
+		res interface{}
+		err error
+	)
+	defer func() {
+		doResponse(c, err, res)
+	}()
+	if res, err = service.GetAllTags(); err != nil {
+		return
 	}
-	DoResponseOK(c, res)
 }

@@ -6,44 +6,40 @@ import (
 	"service"
 )
 
-func NewMood(c *gin.Context){
-	var req protocol.REQNewMood
-	var err error
+func NewMood(c *gin.Context) {
+	var (
+		req protocol.REQNewMood
+		err error
+	)
 
 	defer func() {
-		if err!=nil{
-			DoResponseFail(c,err)
-		}else{
-			DoResponseOK(c,nil)
-		}
+		doResponse(c, err)
 	}()
 
-	if err=c.Bind(&req);err!=nil{
+	if err = c.Bind(&req); err != nil {
 		return
 	}
-	if err=service.NewMood(&req);err!=nil{
+	if err = service.NewMood(&req); err != nil {
 		return
 	}
 }
 
-func LastMood(c *gin.Context){
-	var req protocol.REQLastMood
-	var res *protocol.RESLastMood
-	var err error
+func LastMood(c *gin.Context) {
+	var (
+		req protocol.REQLastMood
+		res interface{}
+		err error
+	)
 	defer func() {
-		if err!=nil{
-			DoResponseFail(c,err)
-		}else{
-			DoResponseOK(c,res)
-		}
+		doResponse(c, err, res)
 	}()
-	if err=c.Bind(&req);err!=nil{
+	if err = c.Bind(&req); err != nil {
 		return
 	}
-	if req.Limit==0{
-		req.Limit=10
+	if req.Limit == 0 {
+		req.Limit = 10
 	}
-	if res,err=service.LastMood(&req);err!=nil{
+	if res, err = service.LastMood(&req); err != nil {
 		return
 	}
 }

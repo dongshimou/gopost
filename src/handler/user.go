@@ -7,59 +7,60 @@ import (
 )
 
 func SignIn(c *gin.Context) {
-	var req protocol.REQSignin
-	var res *protocol.RESSignIn
-	var err error
-
+	var (
+		req protocol.REQSignin
+		res *protocol.RESSignIn
+		err error
+	)
+	defer func() {
+		doResponse(c, err, res)
+	}()
 	req.IP = c.ClientIP()
 	//todo ip 限制
 	if err = c.Bind(&req); err != nil {
-		goto fail
+		return
 	}
 
 	if res, err = service.SignIn(&req); err != nil {
-		goto fail
+		return
 	}
 	setHeaderToken(c, res.Token)
-	DoResponseOK(c, res)
-	return
-
-fail:
-	DoResponseFail(c, err)
-
 }
 func SignOut(c *gin.Context) {
-
-	DoResponseOK(c, nil)
-	return
-
+	var (
+		err error
+	)
+	defer func() {
+		doResponse(c, err)
+	}()
 }
 
 func SignVerify(c *gin.Context) {
-
-	DoResponseOK(c, nil)
-	return
+	var (
+		err error
+	)
+	defer func() {
+		doResponse(c, err)
+	}()
 }
 
 func SignUp(c *gin.Context) {
 
-	var req protocol.REQSignUp
-	var res *protocol.RESSignUp
-	var err error
-
+	var (
+		req protocol.REQSignUp
+		res interface{}
+		err error
+	)
+	defer func() {
+		doResponse(c, err, res)
+	}()
 	req.IP = c.ClientIP()
 	//todo ip 限制
 	if err = c.Bind(&req); err != nil {
-		goto fail
+		return
 	}
 
 	if res, err = service.SignUp(&req); err != nil {
-		goto fail
+		return
 	}
-	DoResponseOK(c, res)
-	return
-
-fail:
-	DoResponseFail(c, err)
-
 }

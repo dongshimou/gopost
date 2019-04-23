@@ -22,7 +22,7 @@ func doFail(c *gin.Context, code int, msg string) {
 		c.JSON(http.StatusOK, res)
 	}
 }
-func DoResponseFail(c *gin.Context, err error) {
+func doResponseFail(c *gin.Context, err error) {
 	switch v := err.(type) {
 	case *utility.InnerError:
 		doFail(c, v.Code, v.Msg)
@@ -30,7 +30,34 @@ func DoResponseFail(c *gin.Context, err error) {
 		doFail(c, utility.ERROR_UNKNOW_CODE, err.Error())
 	}
 }
-func DoResponseOK(c *gin.Context, data interface{}) {
+func doCSVOK(c *gin.Context, data []byte) {
+	c.Data(http.StatusOK, "text/csv", data)
+}
+func doResponse(c *gin.Context,args ...interface{}){
+	for _, v := range args {
+		switch data := v.(type) {
+		case error:
+			if data != nil {
+				logger.Error(data)
+				doResponseFail(c, data)
+				return
+			}
+		case []byte:
+			doCSVOK(c, data)
+			return
+		default: //nil
+			if len(args) == 1 {
+				doResponseOK(c, nil)
+			} else {
+				if v == nil {
+					continue
+				}
+				doResponseOK(c, v)
+			}
+		}
+	}
+}
+func doResponseOK(c *gin.Context, data interface{}) {
 	var res interface{}
 	//组装JSON返回数据
 	if data != nil {
@@ -61,7 +88,7 @@ func AuthDecorator(getToken func(string) (*model.User, error), prems ...int) gin
 			} else if token, _ = c.Cookie("user_auth_token"); len(token) > 0 {
 			} else {
 				logger.Print(utility.ERROR_MSG_AUTH_TOKEN_NOT_EXIST)
-				DoResponseFail(c, utility.NewError(utility.ERROR_AUTH_CODE, utility.ERROR_MSG_AUTH_TOKEN_NOT_EXIST))
+				doResponseFail(c, utility.NewError(utility.ERROR_AUTH_CODE, utility.ERROR_MSG_AUTH_TOKEN_NOT_EXIST))
 				c.Abort()
 				return
 			}
@@ -69,13 +96,13 @@ func AuthDecorator(getToken func(string) (*model.User, error), prems ...int) gin
 		logger.Print("user token : ", token)
 		user, err := getToken(token)
 		if err != nil {
-			DoResponseFail(c, err)
+			doResponseFail(c, err)
 			c.Abort()
 			return
 		}
 		//验证权限
 		if err := utility.VerifyPermission(user.Permission, prems...); err != nil {
-			DoResponseFail(c, err)
+			doResponseFail(c, err)
 			c.Abort()
 			return
 		}
