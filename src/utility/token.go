@@ -1,7 +1,7 @@
 package utility
 
 import (
-	"base"
+	"gopost/src/base"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )

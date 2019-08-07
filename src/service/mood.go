@@ -1,9 +1,9 @@
 package service
 
 import (
-	"model"
-	"orm"
-	"protocol"
+	"gopost/src/model"
+	"gopost/src/orm"
+	"gopost/src/protocol"
 )
 
 func NewMood(req *protocol.REQNewMood)(error){

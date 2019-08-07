@@ -1,10 +1,10 @@
 package service
 
 import (
-	"base"
+	"gopost/src/base"
 	"github.com/gorilla/feeds"
-	"model"
-	"orm"
+	"gopost/src/model"
+	"gopost/src/orm"
 	"time"
 )
 

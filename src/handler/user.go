@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"protocol"
-	"service"
+	"gopost/src/protocol"
+	"gopost/src/service"
 )
 
 func SignIn(c *gin.Context) {

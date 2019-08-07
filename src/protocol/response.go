@@ -1,7 +1,7 @@
 package protocol
 
 import (
-	"model"
+	"gopost/src/model"
 )
 
 type Response struct {

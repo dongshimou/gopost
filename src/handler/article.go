@@ -2,9 +2,9 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"logger"
-	"protocol"
-	"service"
+	"gopost/src/logger"
+	"gopost/src/protocol"
+	"gopost/src/service"
 )
 
 func PostReplay(c *gin.Context) {

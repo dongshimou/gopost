@@ -2,7 +2,7 @@ package base
 
 import (
 	"github.com/gin-gonic/gin"
-	"logger"
+	"gopost/src/logger"
 	"strings"
 )
 

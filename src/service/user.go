@@ -1,10 +1,10 @@
 package service
 
 import (
-	"model"
-	"orm"
-	"protocol"
-	"utility"
+	"gopost/src/model"
+	"gopost/src/orm"
+	"gopost/src/protocol"
+	"gopost/src/utility"
 )
 
 func SignIn(req *protocol.REQSignin) (*protocol.RESSignIn, error) {

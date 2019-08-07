@@ -1,13 +1,13 @@
 package v1
 
 import (
-	. "base"
 	"github.com/gin-gonic/gin"
-	"handler"
-	"logger"
-	"model"
-	"orm"
-	"utility"
+	. "gopost/src/base"
+	"gopost/src/handler"
+	"gopost/src/logger"
+	"gopost/src/model"
+	"gopost/src/orm"
+	"gopost/src/utility"
 )
 
 const (

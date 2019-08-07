@@ -3,7 +3,7 @@ package base
 import (
 	"encoding/json"
 	"io/ioutil"
-	"logger"
+	"gopost/src/logger"
 )
 
 type Configs struct {

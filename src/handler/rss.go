@@ -3,7 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"service"
+	"gopost/src/service"
 )
 
 func Rss(c *gin.Context) {
