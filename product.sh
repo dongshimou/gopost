@@ -20,8 +20,7 @@ basepath=$(cd `dirname $0`; pwd)
 #govendor get github.com/go-sql-driver/mysql
 #govendor get github.com/gorilla/feeds
 #govendor get github.com/jinzhu/gorm
-
-cd ../
+#cd ../
 
 go build -o ../bin/gopost
 
