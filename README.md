@@ -3,7 +3,7 @@
 # a restful blog
 #### master : ![](https://travis-ci.org/dongshimou/gopost.svg?branch=master)
 ## require
-1. go >= 1.8.0
+1. go >= 1.11.0
 1. mysql >= 5.5
 
 ## how to run
