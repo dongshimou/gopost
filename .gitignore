@@ -15,6 +15,7 @@
 
 # config file
 develop.json
+bin/*.json
 .idea/
 
 pkg/
