@@ -1,0 +1,26 @@
+{
+  "debug":true,
+  "database":{
+    "host":"localhost",
+    "port":"3306",
+    "username":"username",
+    "password":"password",
+    "database":"database"
+  },
+  "server":{
+    "title":"a small blog",
+    "link":"http://127.0.0.1/",
+    "description":"my blog",
+    "name":"skadi",
+    "pass":"123456",
+    "email":"xx@xx.com",
+    "port":"12345",
+    "tls":false,
+    "cert_file":"cert.pem",
+    "key_file":"privkey.pem"
+  },
+  "token":{
+    "secret_key":"welcome my blog",
+    "ttl":3600
+  }
+}
