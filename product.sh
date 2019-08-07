@@ -5,6 +5,7 @@ git pull origin master
 cd `dirname $0`
 
 export GIN_MODE=release
+export GO111MODULE=on
 
 basepath=$(cd `dirname $0`; pwd)
 
