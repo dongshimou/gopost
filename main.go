@@ -1,9 +1,9 @@
 package main
 
 import (
-	"base"
-	"logger"
-	"v1"
+	"gopost/src/base"
+	"gopost/src/logger"
+	"gopost/src/v1"
 )
 
 func main() {

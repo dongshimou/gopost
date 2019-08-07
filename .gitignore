@@ -20,3 +20,5 @@ develop.json
 pkg/
 src/gopost/vendor
 bin/gopost
+
+go.sum
