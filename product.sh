@@ -23,6 +23,6 @@ basepath=$(cd `dirname $0`; pwd)
 #govendor get github.com/jinzhu/gorm
 #cd ../
 
-go build -o ../bin/gopost
+go build -o ./bin/gopost
 
-cd ../bin && ./gopost
+cd ./bin && ./gopost
