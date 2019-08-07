@@ -104,6 +104,13 @@ var routes = []Route{
 	},
 	Route{
 		"UpdateArticle",
+		"PUT",
+		pathVer + "/article/:oldtitle",
+		handler.UpdateArticle,
+		MakeAuth(model.Article_Update),
+	},
+	Route{
+		"UpdateArticle",
 		"POST",
 		pathVer + "/article/update/:oldtitle",
 		handler.UpdateArticle,

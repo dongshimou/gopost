@@ -47,6 +47,8 @@ func StartService() {
 				router.POST(pattern, hanlders...)
 			case "DELETE":
 				router.DELETE(pattern, hanlders...)
+			case "PUT":
+				router.PUT(pattern, hanlders...)
 			}
 		}
 	}
