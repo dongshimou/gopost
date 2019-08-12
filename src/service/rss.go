@@ -1,8 +1,8 @@
 package service
 
 import (
-	"gopost/src/base"
 	"github.com/gorilla/feeds"
+	"gopost/src/base"
 	"gopost/src/model"
 	"gopost/src/orm"
 	"time"

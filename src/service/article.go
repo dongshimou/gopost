@@ -1,15 +1,16 @@
 package service
 
 import (
-	"gopost/src/orm"
+	"database/sql"
 	"errors"
 	"github.com/jinzhu/gorm"
 	"gopost/src/logger"
 	"gopost/src/model"
+	"gopost/src/orm"
 	"gopost/src/protocol"
-	"time"
 	"gopost/src/utility"
 	"strings"
+	"time"
 )
 
 func CreateArticle(req *protocol.REQNewArticle) error {
@@ -24,9 +25,9 @@ func CreateArticle(req *protocol.REQNewArticle) error {
 	return nil
 }
 
-func share2sns(snsList string)error{
-	slist:=strings.Split(snsList,",")
-	for _,sns:=range slist{
+func share2sns(snsList string) error {
+	slist := strings.Split(snsList, ",")
+	for _, sns := range slist {
 		switch sns {
 		case "twitter":
 
@@ -52,20 +53,58 @@ func createOrupdateArticle(tx *gorm.DB, req *protocol.REQNewArticle, oldTitle st
 		AuthorName: req.CurrUser.Name,
 	}
 	if oldTitle == "" {
-		logger.Debug("create new ",req.Title)
+		logger.Debug("create new ", req.Title)
 		if err := tx.Save(&post).Error; err != nil {
 			return err
 		}
 		logger.Debug("create", req.Title, "success")
 	} else {
 		art := model.Article{}
-		logger.Debug("update -> ",oldTitle)
+		logger.Debug("update -> ", oldTitle)
 		if err := tx.Model(&model.Article{}).Where(&model.Article{Title: oldTitle}).Last(&art).Error; err != nil {
 			return err
 		}
-		if err := tx.Model(&art).Update(&post).Error; err != nil {
+		if err := tx.Set("gorm:save_associations", true).Model(&model.Article{}).Where(&model.Article{Title: oldTitle}).Update(&post).Error; err != nil {
 			return err
 		}
+		//gorm bug : can't del tags
+		{
+			tagsRes := []model.TagArticles{}
+			if err := tx.Model(&model.TagArticles{}).Where(&model.TagArticles{ArticleId: art.ID}).Find(&tagsRes).Error; err != nil {
+				if err == sql.ErrNoRows {
+
+				}
+				return err
+			}
+			//删除
+			for _, v := range tagsRes {
+				find := false
+				for _, vv := range post.Tags {
+					if v.TagId == vv.ID {
+						find = true
+						break
+					}
+				}
+				if !find {
+					tx.Where(&v).Delete(&v)
+					//todo 如果tag已经没有使用了,将其从tags里删除
+				}
+			}
+			//新增
+			for _, v := range post.Tags {
+				find := false
+				for _, vv := range tagsRes {
+					if v.ID == vv.TagId {
+						find = true
+						break
+					}
+				}
+				if !find {
+					tx.Create(&model.TagArticles{ArticleId: art.ID, TagId: v.ID})
+				}
+			}
+		}
+
 		logger.Debug("update", req.Title, "success")
 	}
 	return nil
@@ -79,36 +118,36 @@ func UpdateArticle(req *protocol.REQUpdateArticle) error {
 	db.Commit()
 	return nil
 }
-func GetStat(req *protocol.REQGetStat)(*protocol.RESGetStat,error){
-	res:=protocol.RESGetStat{}
+func GetStat(req *protocol.REQGetStat) (*protocol.RESGetStat, error) {
+	res := protocol.RESGetStat{}
 
 	//倒序统计ip
-	sql:= orm.Get().Model(&model.Stat{}).
+	sql := orm.Get().Model(&model.Stat{}).
 		Select("date,count(ip) as count").
-		Group("date")	.Order("date desc")
+		Group("date").Order("date desc")
 
-	if req.Date!=""{
-			sql=sql.Having("date=?",req.Date)
-		}
-		if err:=sql.Scan(&res.List).
-		Error;err!=nil{
-			return nil,err
-		}
-	return &res,nil
+	if req.Date != "" {
+		sql = sql.Having("date=?", req.Date)
+	}
+	if err := sql.Scan(&res.List).
+		Error; err != nil {
+		return nil, err
+	}
+	return &res, nil
 }
-func StatIp(ip string)error{
-	db:= orm.Get()
-	date:=utility.FormatDate(time.Now())
-	stat:=model.Stat{}
-	stat.Date=date
-	stat.Ip=ip
-	count:=0
-	if err:=db.Model(&model.Stat{}).Where(&stat).Count(&count).Error;err!=nil{
+func StatIp(ip string) error {
+	db := orm.Get()
+	date := utility.FormatDate(time.Now())
+	stat := model.Stat{}
+	stat.Date = date
+	stat.Ip = ip
+	count := 0
+	if err := db.Model(&model.Stat{}).Where(&stat).Count(&count).Error; err != nil {
 		return err
 	}
-	if count==0{
+	if count == 0 {
 		return db.Create(&stat).Error
-	}else{
+	} else {
 		return nil
 	}
 }
@@ -321,13 +360,13 @@ func GetArticleReplays(req *protocol.REQGetReplays) (*protocol.RESGetReplays, er
 
 	if err := db.Model(&article).
 		Select(strings.Join([]string{
-				model.DB_id,
-				model.Table_Replay_AuthorName,
-				model.Table_Replay_IpAddress,
-				model.Table_Replay_Context,
-				model.DB_created_at,
-			},",")).
-		Order(strings.Join([]string{model.DB_created_at,model.DB_desc}," ")).
+			model.DB_id,
+			model.Table_Replay_AuthorName,
+			model.Table_Replay_IpAddress,
+			model.Table_Replay_Context,
+			model.DB_created_at,
+		}, ",")).
+		Order(strings.Join([]string{model.DB_created_at, model.DB_desc}, " ")).
 		Related(&article.Replays, "Replays").Error; err != nil {
 		return nil, err
 	}

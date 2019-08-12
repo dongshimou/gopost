@@ -1,13 +1,13 @@
 package handler
 
 import (
-	"gopost/src/base"
 	"github.com/gin-gonic/gin"
+	"gopost/src/base"
 	"gopost/src/logger"
 	"gopost/src/model"
-	"net/http"
 	"gopost/src/protocol"
 	"gopost/src/utility"
+	"net/http"
 )
 
 func doFail(c *gin.Context, code int, msg string) {
@@ -33,7 +33,7 @@ func doResponseFail(c *gin.Context, err error) {
 func doCSVOK(c *gin.Context, data []byte) {
 	c.Data(http.StatusOK, "text/csv", data)
 }
-func doResponse(c *gin.Context,args ...interface{}){
+func doResponse(c *gin.Context, args ...interface{}) {
 	for _, v := range args {
 		switch data := v.(type) {
 		case error:

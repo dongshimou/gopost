@@ -1,13 +1,13 @@
 package orm
 
 import (
-	"gopost/src/base"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
-	"log"
+	"gopost/src/base"
 	"gopost/src/logger"
 	"gopost/src/model"
+	"log"
 	"time"
 )
 

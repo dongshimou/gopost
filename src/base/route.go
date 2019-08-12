@@ -38,8 +38,8 @@ func StartService() {
 			hanlders = append(hanlders, route.AuthHandler...)
 		}
 		hanlders = append(hanlders, route.HandlerFunc)
-		methods:=strings.Split(route.Method,",")
-		for _,me:=range methods {
+		methods := strings.Split(route.Method, ",")
+		for _, me := range methods {
 			switch strings.ToUpper(me) {
 			case "GET":
 				router.GET(pattern, hanlders...)

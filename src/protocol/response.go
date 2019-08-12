@@ -72,8 +72,8 @@ type RESGetTags struct {
 	Names []string `json:"names"`
 }
 type ResGetStatSingle struct {
-	Date string `json:"date"`
-	Count int `json:"count"`
+	Date  string `json:"date"`
+	Count int    `json:"count"`
 }
 type RESGetStat struct {
 	List []ResGetStatSingle `json:"list"`

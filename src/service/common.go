@@ -1,9 +1,9 @@
 package service
 
 import (
+	"gopost/src/utility"
 	"strings"
 	"time"
-	"gopost/src/utility"
 )
 
 func isNullOrEmpty(v interface{}) bool {

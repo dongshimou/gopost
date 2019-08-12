@@ -8,7 +8,7 @@ type REQNewArticle struct {
 	Title    string   `json:"title" binding:"required"`
 	Tags     []string `json:"tags"`
 	Context  string   `json:"context" binding:"required"`
-	SNS      string `json:"sns"`
+	SNS      string   `json:"sns"`
 	CurrUser *model.User
 }
 type REQUpdateArticle struct {
