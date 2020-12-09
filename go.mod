@@ -8,4 +8,5 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gorilla/feeds v1.1.1
 	github.com/jinzhu/gorm v1.9.10
+	github.com/kr/pretty v0.2.1 // indirect
 )
