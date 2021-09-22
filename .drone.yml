@@ -1,0 +1,15 @@
+---
+kind: pipeline
+type: exec
+name: ci
+
+steps:
+- name : del old
+  commands:
+  - docker rmi --force gopost
+- name : build docker
+  commands:
+  - docker build . -t gopost -f ./DockerFile 
+- name : start
+  commands:
+  - docker run -d --network-host -e TZ=Asia/Shanghai --name=gopost --restart always gopost
