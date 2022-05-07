@@ -2,12 +2,12 @@ package base
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type cors struct {
@@ -257,11 +257,15 @@ func New(config Config) gin.HandlerFunc {
 func MyCors() gin.HandlerFunc {
 	config := DefaultConfig()
 	config.AllowOriginFunc = func(origin string) bool {
-		log.Println("输入域名:", origin)
-		return true
+		// log.Println("输入域名:", origin)
+		if strings.Contains(origin,"yanthems") {
+			return true
+		}
+		return false
 	}
 	config.AllowCredentials = true
 	config.AllowOrigins = []string{"*"}
+	// config.AllowAllOrigins = true
 
 	return New(config)
 }
