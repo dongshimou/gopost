@@ -26,21 +26,28 @@ type REQUpdateArticle struct {
 }
 
 // REQGetArticles 获取文章列表的请求结构
+// 支持两种分页方式：
+//   - 游标分页: 使用 time + size (原有方式)
+//   - 页码分页: 使用 page + page_size (新增)
 type REQGetArticles struct {
-	Time string `json:"time" form:"time" binding:"required"` // 时间筛选条件，必需
-	Size string `json:"size" form:"size" binding:"required"` // 每页数量，必需
+	Time     string `json:"time" form:"time"`           // 时间游标，用于获取比此时间更早的文章
+	Size     string `json:"size" form:"size"`           // 每页数量 (游标分页)
+	Page     string `json:"page" form:"page"`           // 页码，从 1 开始 (页码分页)
+	PageSize string `json:"page_size" form:"page_size"` // 每页数量 (页码分页)，默认 10
 }
 
 // REQSearchArticle 搜索文章的请求结构
 type REQSearchArticle struct {
-	Keyword string `json:"keyword" form:"keyword" binding:"required"` // 搜索关键词，必需
-	Size    string `json:"size" form:"size"`                          // 每页数量，默认 10
+	Keyword  string `json:"keyword" form:"keyword" binding:"required"` // 搜索关键词，必需
+	Page     string `json:"page" form:"page"`                          // 页码，从 1 开始
+	PageSize string `json:"page_size" form:"page_size"`                // 每页数量，默认 10
 }
 
 // REQGetArticlesByTag 按标签获取文章的请求结构
 type REQGetArticlesByTag struct {
-	Tag  string `json:"tag" form:"tag" binding:"required"` // 标签名称，必需
-	Size string `json:"size" form:"size"`                  // 每页数量，默认 10
+	Tag      string `json:"tag" form:"tag" binding:"required"` // 标签名称，必需
+	Page     string `json:"page" form:"page"`                  // 页码，从 1 开始
+	PageSize string `json:"page_size" form:"page_size"`        // 每页数量，默认 10
 }
 
 // REQGetArticle 获取单篇文章的请求结构

@@ -152,38 +152,57 @@ func StatIp(ip string) error {
 	}
 }
 func GetArticles(req *protocol.REQGetArticles) (*protocol.RESGetArticles, error) {
-
-	t1, errT1 := parseTime(req.Time)
-	t2, errT2 := parseUnix(req.Time)
-	if errT1 != nil && errT2 != nil {
-		return nil, utility.NewError(utility.ERROR_REQUEST_CODE, utility.ERROR_REQUEST_MSG)
-	}
-	var befor time.Time
-	if errT1 == nil {
-		befor = t1
-	} else {
-		befor = t2
-	}
-	logger.Debug(befor.Unix())
-	logger.Debug(befor.String())
-	logger.Debug(formatDatetime(befor))
-
-	limit, err := parseCount(req.Size)
-	if err != nil {
-		return nil, err
-	}
-	arts := []model.Article{}
-
 	db := orm.Get()
-	if err = db.Model(&model.Article{}).
-		Where("created_at < ?", befor).
-		Order("created_at desc").
-		Limit(limit).
-		Find(&arts).Error; err != nil {
-		return nil, err
+	var arts []model.Article
+	var err error
+
+	// 判断分页方式
+	if req.Page != "" || req.PageSize != "" {
+		// 页码分页模式
+		page := parsePage(req.Page)
+		pageSize := parsePageSize(req.PageSize)
+		offset := calcOffset(page, pageSize)
+
+		if err = db.Model(&model.Article{}).
+			Order("created_at desc").
+			Limit(pageSize).
+			Offset(offset).
+			Find(&arts).Error; err != nil {
+			return nil, err
+		}
+	} else {
+		// 时间游标分页模式（原有方式）
+		t1, errT1 := parseTime(req.Time)
+		t2, errT2 := parseUnix(req.Time)
+		if errT1 != nil && errT2 != nil {
+			return nil, utility.NewError(utility.ERROR_REQUEST_CODE, utility.ERROR_REQUEST_MSG)
+		}
+		var befor time.Time
+		if errT1 == nil {
+			befor = t1
+		} else {
+			befor = t2
+		}
+		logger.Debug(befor.Unix())
+		logger.Debug(befor.String())
+		logger.Debug(formatDatetime(befor))
+
+		limit, parseErr := parseCount(req.Size)
+		if parseErr != nil {
+			return nil, parseErr
+		}
+
+		if err = db.Model(&model.Article{}).
+			Where("created_at < ?", befor).
+			Order("created_at desc").
+			Limit(limit).
+			Find(&arts).Error; err != nil {
+			return nil, err
+		}
 	}
 
-	for i, _ := range arts {
+	// 加载标签
+	for i := range arts {
 		if err = db.Model(&arts[i]).Select("name").
 			Related(&arts[i].Tags, "tags").Error; err != nil {
 			return nil, err
@@ -199,8 +218,8 @@ func GetArticles(req *protocol.REQGetArticles) (*protocol.RESGetArticles, error)
 			a.AuthorName,
 			func(tags []*model.Tag) []string {
 				ts := []string{}
-				for i, _ := range tags {
-					ts = append(ts, tags[i].Name)
+				for _, tag := range tags {
+					ts = append(ts, tag.Name)
 				}
 				return ts
 			}(a.Tags),
@@ -216,14 +235,10 @@ func GetArticles(req *protocol.REQGetArticles) (*protocol.RESGetArticles, error)
 
 // SearchArticles 根据标题关键词搜索文章
 func SearchArticles(req *protocol.REQSearchArticle) (*protocol.RESGetArticles, error) {
-	// 解析分页大小，默认 10
-	limit := 10
-	if req.Size != "" {
-		parsedLimit, err := parseCount(req.Size)
-		if err == nil {
-			limit = int(parsedLimit)
-		}
-	}
+	// 解析分页参数
+	page := parsePage(req.Page)
+	pageSize := parsePageSize(req.PageSize)
+	offset := calcOffset(page, pageSize)
 
 	arts := []model.Article{}
 	db := orm.Get()
@@ -233,7 +248,8 @@ func SearchArticles(req *protocol.REQSearchArticle) (*protocol.RESGetArticles, e
 	if err := db.Model(&model.Article{}).
 		Where("title LIKE ?", keyword).
 		Order("created_at desc").
-		Limit(limit).
+		Limit(pageSize).
+		Offset(offset).
 		Find(&arts).Error; err != nil {
 		return nil, err
 	}
@@ -271,14 +287,10 @@ func SearchArticles(req *protocol.REQSearchArticle) (*protocol.RESGetArticles, e
 
 // GetArticlesByTag 根据标签获取文章列表
 func GetArticlesByTag(req *protocol.REQGetArticlesByTag) (*protocol.RESGetArticles, error) {
-	// 解析分页大小，默认 10
-	limit := 10
-	if req.Size != "" {
-		parsedLimit, err := parseCount(req.Size)
-		if err == nil {
-			limit = int(parsedLimit)
-		}
-	}
+	// 解析分页参数
+	page := parsePage(req.Page)
+	pageSize := parsePageSize(req.PageSize)
+	offset := calcOffset(page, pageSize)
 
 	db := orm.Get()
 
@@ -292,12 +304,16 @@ func GetArticlesByTag(req *protocol.REQGetArticlesByTag) (*protocol.RESGetArticl
 		return nil, err
 	}
 
-	// 获取关联的文章
+	// 使用 JOIN 查询获取分页的文章
 	var arts []model.Article
-	if err := db.Model(&tag).
-		Order("created_at desc").
-		Limit(limit).
-		Related(&arts, "Articles").Error; err != nil {
+	if err := db.Table("articles").
+		Select("articles.*").
+		Joins("INNER JOIN tag_articles ON tag_articles.article_id = articles.id").
+		Where("tag_articles.tag_id = ?", tag.ID).
+		Order("articles.created_at desc").
+		Limit(pageSize).
+		Offset(offset).
+		Find(&arts).Error; err != nil {
 		return nil, err
 	}
 

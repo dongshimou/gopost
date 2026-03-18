@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2] - 2026-03-18
+
+### Added
+- 添加列表分页功能，支持 `page` 和 `page_size` 参数
+  - `GET /v1/article?page=1&page_size=10`
+  - `GET /v1/article/search?keyword=xxx&page=1&page_size=10`
+  - `GET /v1/article/tag?tag=xxx&page=1&page_size=10`
+
+### Changed
+- `GetArticles` 接口现在支持两种分页模式：
+  - 页码分页：使用 `page` + `page_size` 参数
+  - 游标分页：使用 `time` + `size` 参数（保持向后兼容）
+- `SearchArticles` 和 `GetArticlesByTag` 接口使用新的分页参数
+
 ## [0.1] - 2026-03-18
 
 ### Added
