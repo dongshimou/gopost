@@ -213,6 +213,125 @@ func GetArticles(req *protocol.REQGetArticles) (*protocol.RESGetArticles, error)
 	}
 	return &protocol.RESGetArticles{resData}, nil
 }
+
+// SearchArticles 根据标题关键词搜索文章
+func SearchArticles(req *protocol.REQSearchArticle) (*protocol.RESGetArticles, error) {
+	// 解析分页大小，默认 10
+	limit := 10
+	if req.Size != "" {
+		parsedLimit, err := parseCount(req.Size)
+		if err == nil {
+			limit = int(parsedLimit)
+		}
+	}
+
+	arts := []model.Article{}
+	db := orm.Get()
+
+	// 使用 LIKE 查询标题包含关键词的文章
+	keyword := "%" + req.Keyword + "%"
+	if err := db.Model(&model.Article{}).
+		Where("title LIKE ?", keyword).
+		Order("created_at desc").
+		Limit(limit).
+		Find(&arts).Error; err != nil {
+		return nil, err
+	}
+
+	// 加载标签关联
+	for i := range arts {
+		if err := db.Model(&arts[i]).Select("name").
+			Related(&arts[i].Tags, "tags").Error; err != nil {
+			return nil, err
+		}
+	}
+
+	// 构建响应数据
+	resData := make([]protocol.RESGetArticle, len(arts))
+	for i := 0; i < len(arts); i++ {
+		a := &arts[i]
+		resData[i] = protocol.RESGetArticle{
+			Aid:    a.ID,
+			Title:  a.Title,
+			Author: a.AuthorName,
+			Tags: func(tags []*model.Tag) []string {
+				ts := []string{}
+				for _, tag := range tags {
+					ts = append(ts, tag.Name)
+				}
+				return ts
+			}(a.Tags),
+			Context:        a.Context,
+			CreateDatetime: formatDatetime(a.CreatedAt),
+			EditDatetime:   formatDatetime(a.UpdatedAt),
+		}
+	}
+	return &protocol.RESGetArticles{resData}, nil
+}
+
+// GetArticlesByTag 根据标签获取文章列表
+func GetArticlesByTag(req *protocol.REQGetArticlesByTag) (*protocol.RESGetArticles, error) {
+	// 解析分页大小，默认 10
+	limit := 10
+	if req.Size != "" {
+		parsedLimit, err := parseCount(req.Size)
+		if err == nil {
+			limit = int(parsedLimit)
+		}
+	}
+
+	db := orm.Get()
+
+	// 根据标签名查找标签
+	tag := model.Tag{}
+	if err := db.Where("name = ?", req.Tag).First(&tag).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// 标签不存在，返回空列表
+			return &protocol.RESGetArticles{}, nil
+		}
+		return nil, err
+	}
+
+	// 获取关联的文章
+	var arts []model.Article
+	if err := db.Model(&tag).
+		Order("created_at desc").
+		Limit(limit).
+		Related(&arts, "Articles").Error; err != nil {
+		return nil, err
+	}
+
+	// 加载每篇文章的标签
+	for i := range arts {
+		if err := db.Model(&arts[i]).Select("name").
+			Related(&arts[i].Tags, "tags").Error; err != nil {
+			return nil, err
+		}
+	}
+
+	// 构建响应数据
+	resData := make([]protocol.RESGetArticle, len(arts))
+	for i := 0; i < len(arts); i++ {
+		a := &arts[i]
+		resData[i] = protocol.RESGetArticle{
+			Aid:    a.ID,
+			Title:  a.Title,
+			Author: a.AuthorName,
+			Tags: func(tags []*model.Tag) []string {
+				ts := []string{}
+				for _, tag := range tags {
+					ts = append(ts, tag.Name)
+				}
+				return ts
+			}(a.Tags),
+			Context:        a.Context,
+			CreateDatetime: formatDatetime(a.CreatedAt),
+			EditDatetime:   formatDatetime(a.UpdatedAt),
+		}
+	}
+	return &protocol.RESGetArticles{resData}, nil
+}
+
 func GetArticle(req *protocol.REQGetArticle) (*protocol.RESGetArticle, error) {
 	article := model.Article{}
 	if !isNullOrEmpty(req.Aid) {

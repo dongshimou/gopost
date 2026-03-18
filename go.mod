@@ -8,5 +8,11 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorilla/feeds v1.1.1
 	github.com/jinzhu/gorm v1.9.10
+	github.com/sirupsen/logrus v1.9.4
+	github.com/stretchr/testify v1.11.1
+)
+
+require (
 	github.com/kr/pretty v0.2.1 // indirect
+	github.com/leodido/go-urn v1.4.0 // indirect
 )

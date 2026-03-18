@@ -1,3 +1,5 @@
+// Package handler 包含所有 HTTP 请求处理器
+// article.go 处理文章和评论相关的 API 请求
 package handler
 
 import (
@@ -7,6 +9,11 @@ import (
 	"gopost/src/service"
 )
 
+// ==================== 评论相关处理器 ====================
+
+// PostReplay 创建新评论
+// POST /v1/replay
+// 需要: 评论创建权限
 func PostReplay(c *gin.Context) {
 	var (
 		req protocol.REQNewReplay
@@ -18,14 +25,20 @@ func PostReplay(c *gin.Context) {
 	if req.CurrUser, err = getCurrUser(c); err != nil {
 		return
 	}
-	if err = c.Bind(&req); err != nil {
+	// 绑定并验证 JSON 请求体
+	if err = c.ShouldBindJSON(&req); err != nil {
 		return
 	}
+	// 获取客户端 IP
 	req.IpAddress = c.ClientIP()
+	// 调用服务层创建评论
 	if err = service.PostReplay(&req); err != nil {
 		return
 	}
 }
+
+// GetReplays 获取评论列表
+// GET /v1/replay/:title
 func GetReplays(c *gin.Context) {
 	var (
 		req protocol.REQGetReplays
@@ -98,6 +111,45 @@ func GetArticles(c *gin.Context) {
 		return
 	}
 }
+
+// SearchArticles 搜索文章
+// GET /v1/article/search?keyword=xxx
+func SearchArticles(c *gin.Context) {
+	var (
+		req protocol.REQSearchArticle
+		res interface{}
+		err error
+	)
+	defer func() {
+		doResponse(c, err, res)
+	}()
+	if err = c.Bind(&req); err != nil {
+		return
+	}
+	if res, err = service.SearchArticles(&req); err != nil {
+		return
+	}
+}
+
+// GetArticlesByTag 按标签获取文章
+// GET /v1/article/tag?tag=xxx&size=10
+func GetArticlesByTag(c *gin.Context) {
+	var (
+		req protocol.REQGetArticlesByTag
+		res interface{}
+		err error
+	)
+	defer func() {
+		doResponse(c, err, res)
+	}()
+	if err = c.Bind(&req); err != nil {
+		return
+	}
+	if res, err = service.GetArticlesByTag(&req); err != nil {
+		return
+	}
+}
+
 func StatIp(c *gin.Context) {
 	ip := c.ClientIP()
 	if err := service.StatIp(ip); err != nil {
@@ -152,7 +204,7 @@ func CreateArticle(c *gin.Context) {
 	if req.CurrUser, err = getCurrUser(c); err != nil {
 		return
 	}
-	if err = c.Bind(&req); err != nil {
+	if err = c.ShouldBindJSON(&req); err != nil {
 		return
 	}
 	if err = service.CreateArticle(&req); err != nil {
@@ -170,7 +222,7 @@ func UpdateArticle(c *gin.Context) {
 	if req.CurrUser, err = getCurrUser(c); err != nil {
 		return
 	}
-	if err = c.Bind(&req); err != nil {
+	if err = c.ShouldBindJSON(&req); err != nil {
 		return
 	}
 	req.OldTitle = c.Param("oldtitle")
